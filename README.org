@@ -1,0 +1,18 @@
+
+
+
+* ESP32
+
+** Physical
+| Pin | Function |
+|-----+----------|
+|  12 | SCL      |
+|  14 | SDA      |
+
+** How to go to repl
+
+* References
+
+bme280 code pilfered from
+
+  https://github.com/catdog2/mpy_bme280_esp8266
