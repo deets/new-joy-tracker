@@ -1,0 +1,15 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP AZReady_ESP32
+D Generic connector, single row, 01x19
+K connector
+F ~
+$ENDCMP
+#
+$CMP Conn_01x19
+D Generic connector, single row, 01x19
+K connector
+F ~
+$ENDCMP
+#
+#End Doc Library
