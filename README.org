@@ -1,5 +1,18 @@
 
+* Price Calculation
 
+All calculations are based on a total of 20 Boards.
+
+| Component       | Price per unit |
+|-----------------+----------------|
+| PCB             |           9.00 |
+| ESP32           |          10.00 |
+| DC/DC Converter |           4.00 |
+|                 |                |
+
+** PCB 
+
+https://portal.multi-circuit-boards.eu/
 
 * ESP32
 
