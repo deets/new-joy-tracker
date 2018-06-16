@@ -6,7 +6,7 @@ EESchema-LIBRARY Version 2.3
 DEF AZReady_ESP32 U 0 40 Y Y 1 F N
 F0 "U" 0 1000 50 H V C CNN
 F1 "AZReady_ESP32" 0 -1050 50 H V C CNN
-F2 "" -350 0 50 H I C CNN
+F2 "new-joy:AZReady_ESP32" -350 0 50 H I C CNN
 F3 "" -350 0 50 H I C CNN
 $FPLIST
  Connector*:*_??x*mm*
@@ -66,10 +66,10 @@ ENDDEF
 # dc_dc_converter
 #
 DEF dc_dc_converter U 0 40 Y Y 1 F N
-F0 "U" -200 -400 60 H V C CNN
-F1 "dc_dc_converter" -200 -800 60 H V C CNN
-F2 "" -200 -400 60 H I C CNN
-F3 "" -200 -400 60 H I C CNN
+F0 "U" 0 300 60 H V C CNN
+F1 "dc_dc_converter" 0 -350 60 H V C CNN
+F2 "" 0 300 60 H I C CNN
+F3 "" 0 300 60 H I C CNN
 DRAW
 X VIN+ 1 -550 150 200 R 50 50 1 1 W
 X VIN- 2 -550 -150 200 R 50 50 1 1 W

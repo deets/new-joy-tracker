@@ -16,6 +16,22 @@ X +12V 1 0 0 0 U 50 50 1 1 W N
 ENDDRAW
 ENDDEF
 #
+# +3V3
+#
+DEF +3V3 #PWR 0 0 Y Y 1 F P
+F0 "#PWR" 0 -150 50 H I C CNN
+F1 "+3V3" 0 140 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+ALIAS +3.3V
+DRAW
+P 2 0 1 0 -30 50 0 100 N
+P 2 0 1 0 0 0 0 100 N
+P 2 0 1 0 0 100 30 50 N
+X +3V3 1 0 0 0 U 50 50 1 1 W N
+ENDDRAW
+ENDDEF
+#
 # +5V
 #
 DEF +5V #PWR 0 0 Y Y 1 F P
@@ -31,12 +47,35 @@ X +5V 1 0 0 0 U 50 50 1 1 W N
 ENDDRAW
 ENDDEF
 #
+# AZ1117-1.2
+#
+DEF AZ1117-1.2 U 0 10 Y Y 1 F N
+F0 "U" -150 125 50 H V C CNN
+F1 "AZ1117-1.2" 0 125 50 H V L CNN
+F2 "" 0 250 50 H I C CIN
+F3 "" 0 0 50 H I C CNN
+ALIAS AZ1117-1.5 AZ1117-1.8 AZ1117-2.5 AZ1117-2.85 AZ1117-3.3 AZ1117-5.0
+$FPLIST
+ SOT?223*
+ SOT?89*
+ TO?220*
+ TO?252*
+ TO?263*
+$ENDFPLIST
+DRAW
+S -200 75 200 -200 0 1 10 f
+X GND 1 0 -300 100 U 50 50 1 1 W
+X VO 2 300 0 100 L 50 50 1 1 w
+X VI 3 -300 0 100 R 50 50 1 1 W
+ENDDRAW
+ENDDEF
+#
 # AZReady_ESP32
 #
 DEF AZReady_ESP32 U 0 40 Y Y 1 F N
 F0 "U" 0 1000 50 H V C CNN
 F1 "AZReady_ESP32" 0 -1050 50 H V C CNN
-F2 "" -350 0 50 H I C CNN
+F2 "new-joy:AZReady_ESP32" -350 0 50 H I C CNN
 F3 "" -350 0 50 H I C CNN
 $FPLIST
  Connector*:*_??x*mm*
@@ -93,6 +132,57 @@ X G5 29 600 0 200 L 50 50 1 1 B
 ENDDRAW
 ENDDEF
 #
+# Conn_01x04
+#
+DEF Conn_01x04 J 0 40 Y N 1 F N
+F0 "J" 0 200 50 H V C CNN
+F1 "Conn_01x04" 0 -300 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ Connector*:*_??x*mm*
+ Connector*:*1x??x*mm*
+ Pin?Header?Straight?1X*
+ Pin?Header?Angled?1X*
+ Socket?Strip?Straight?1X*
+ Socket?Strip?Angled?1X*
+$ENDFPLIST
+DRAW
+S -50 -195 0 -205 1 1 6 N
+S -50 -95 0 -105 1 1 6 N
+S -50 5 0 -5 1 1 6 N
+S -50 105 0 95 1 1 6 N
+S -50 150 50 -250 1 1 10 f
+X Pin_1 1 -200 100 150 R 50 50 1 1 P
+X Pin_2 2 -200 0 150 R 50 50 1 1 P
+X Pin_3 3 -200 -100 150 R 50 50 1 1 P
+X Pin_4 4 -200 -200 150 R 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+# D
+#
+DEF D D 0 40 N N 1 F N
+F0 "D" 0 100 50 H V C CNN
+F1 "D" 0 -100 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ TO-???*
+ *SingleDiode
+ *_Diode_*
+ *SingleDiode*
+ D_*
+$ENDFPLIST
+DRAW
+P 2 0 1 8 -50 50 -50 -50 N
+P 2 0 1 0 50 0 -50 0 N
+P 4 0 1 8 50 50 50 -50 -50 0 50 50 N
+X K 1 -150 0 100 R 50 50 1 1 P
+X A 2 150 0 100 L 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
 # GND
 #
 DEF GND #PWR 0 0 Y Y 1 F P
@@ -125,6 +215,24 @@ X GNDPWR 1 0 0 0 U 50 50 1 1 W N
 ENDDRAW
 ENDDEF
 #
+# R
+#
+DEF R R 0 0 N Y 1 F N
+F0 "R" 80 0 50 V V C CNN
+F1 "R" 0 0 50 V V C CNN
+F2 "" -70 0 50 V I C CNN
+F3 "" 0 0 50 H I C CNN
+$FPLIST
+ R_*
+ R_*
+$ENDFPLIST
+DRAW
+S -40 -100 40 100 0 1 10 N
+X ~ 1 0 150 50 D 50 50 1 1 P
+X ~ 2 0 -150 50 U 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
 # Screw_Terminal_01x02
 #
 DEF Screw_Terminal_01x02 J 0 40 Y N 1 F N
@@ -154,7 +262,7 @@ ENDDEF
 DEF dc_dc_converter U 0 40 Y Y 1 F N
 F0 "U" 0 300 60 H V C CNN
 F1 "dc_dc_converter" 0 -350 60 H V C CNN
-F2 "" 0 300 60 H I C CNN
+F2 "new-joy:dc_dc_converter" 0 300 60 H I C CNN
 F3 "" 0 300 60 H I C CNN
 DRAW
 X VIN+ 1 -550 150 200 R 50 50 1 1 W
