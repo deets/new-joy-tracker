@@ -14,6 +14,8 @@ All calculations are based on a total of 20 Boards.
 
 https://portal.multi-circuit-boards.eu/
 
+[[https://www.amazon.de/gp/product/B0178DX1ZC/ref%3Doh_aui_search_detailpage?ie%3DUTF8&psc%3D1][DC/DC converter]]
+
 * ESP32
 
 ** Physical
@@ -21,6 +23,10 @@ https://portal.multi-circuit-boards.eu/
 |-----+----------|
 |  12 | SCL      |
 |  14 | SDA      |
+
+** Useful links
+
+ - [[http://esp32.net/#Hardware][Overview of boards from espressif themselves]]
 
 ** How to go to repl
 
