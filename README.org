@@ -27,6 +27,7 @@ https://portal.multi-circuit-boards.eu/
 ** Useful links
 
  - [[http://esp32.net/#Hardware][Overview of boards from espressif themselves]]
+ - [[http://playground.arduino.cc/Main/MPU-6050][MPU6050 programming with the Arduino]]
 
 ** How to go to repl
 
