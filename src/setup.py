@@ -4,9 +4,12 @@ import network
 import socket
 
 from bme280 import BME280
+from mpu6050 import MPU
 
-SCL = 12
-SDA = 14
+# SCL = 12
+# SDA = 14
+SCL = 27
+SDA = 26
 
 PORT = 5000
 
@@ -26,12 +29,17 @@ def setup_bmp280(i2c):
     return pressure_sensor
 
 
+def setup_mpu(i2c):
+    return MPU(i2c)
+
+
 def ip2bits(ip):
     res = 0
     for part in ip.split("."):
         res <<= 8
         res |= int(part)
     return res
+
 
 def bits2ip(bits):
     res = []
@@ -75,11 +83,12 @@ def setup_socket(nic):
 def setup_all():
     i2c = setup_i2c()
     pressure_sensor = setup_bmp280(i2c)
-    return pressure_sensor
+    mpu = setup_mpu(i2c)
+    return pressure_sensor, mpu
 
 
 def main():
-    pressure_sensor = setup_all()
+    pressure_sensor, mpu = setup_all()
     nic, broadcast_address = setup_wifi()
     s = setup_socket(nic)
     while True:
