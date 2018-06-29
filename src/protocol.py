@@ -1,17 +1,27 @@
 # -*- coding: utf-8 -*-
 # Copyright: 2018, Diez B. Roggisch, Berlin . All rights reserved.
+import time
 import ustruct
 
 class Protocol:
 
-    FORMAT = "<III"
+    FORMAT = "<IHIII" # NAME, SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE
 
     def __init__(self, name):
         assert len(name) == 4
         self._name = ustruct.unpack("<I", ustruct.pack("ssss", *name))[0]
-        self._buffer = bytearray(ustruct.calcsize(self.FORMAT))
+        self.buffer = bytearray(ustruct.calcsize(self.FORMAT))
+        self._count = 0
 
 
     def message(self, temperature, pressure):
-        ustruct.pack_into(self.FORMAT, self._buffer, 0, self._name, temperature, pressure)
-        return self._buffer
+        ustruct.pack_into(
+            self.FORMAT,
+            self.buffer, 0,
+            self._name,
+            self._count,
+            time.ticks_ms(),
+            temperature,
+            pressure,
+        )
+        self._count += 1

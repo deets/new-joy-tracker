@@ -1,3 +1,4 @@
+import array
 import machine
 import time
 import network
@@ -93,6 +94,10 @@ def main(name="BOB\0"):
     nic, broadcast_address = setup_wifi()
     s = setup_socket(nic)
     protocol = Protocol(name)
+    bmp_data = array.array("i", [0, 0, 0])
+    address = (broadcast_address, PORT)
+    protocol_buffer = protocol.buffer
     while True:
-        temp, pressure, _ = pressure_sensor.read_compensated_data()
-        s.sendto(protocol.message(temp, pressure), (broadcast_address, PORT))
+        pressure_sensor.read_compensated_data(bmp_data)
+        protocol.message(bmp_data[0], bmp_data[1])
+        s.sendto(protocol_buffer, address)
