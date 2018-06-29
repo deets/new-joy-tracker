@@ -1,3 +1,4 @@
+import gc
 import array
 import machine
 import time
@@ -97,7 +98,12 @@ def main(name="BOB\0"):
     bmp_data = array.array("i", [0, 0, 0])
     address = (broadcast_address, PORT)
     protocol_buffer = protocol.buffer
+    then = time.time()
     while True:
         pressure_sensor.read_compensated_data(bmp_data)
         protocol.message(bmp_data[0], bmp_data[1])
         s.sendto(protocol_buffer, address)
+        if time.time() - then > 1:
+            print(gc.mem_free())
+            gc.collect()
+            then += 1
