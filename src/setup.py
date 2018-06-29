@@ -5,6 +5,7 @@ import socket
 
 from bme280 import BME280
 from mpu6050 import MPU
+from protocol import Protocol
 
 # SCL = 12
 # SDA = 14
@@ -87,12 +88,11 @@ def setup_all():
     return pressure_sensor, mpu
 
 
-def main():
+def main(name="BOB\0"):
     pressure_sensor, mpu = setup_all()
     nic, broadcast_address = setup_wifi()
     s = setup_socket(nic)
+    protocol = Protocol(name)
     while True:
-        print(pressure_sensor.values)
-        raw_data = pressure_sensor.read_compensated_data()
-        s.sendto(raw_data, (broadcast_address, PORT))
-        #time.sleep(.2)
+        temp, pressure, _ = pressure_sensor.read_compensated_data()
+        s.sendto(protocol.message(temp, pressure), (broadcast_address, PORT))
