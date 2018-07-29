@@ -45,3 +45,11 @@ class Hub:
 
     def _convert_pressure(self, pressure):
         return pressure / 25600.0
+
+
+if __name__ == '__main__':
+    import signal
+
+    hub = Hub()
+    hub.start()
+    signal.pause()
