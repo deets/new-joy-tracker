@@ -1,36 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:new-joy
-LIBS:power
-LIBS:device
-LIBS:transistors
-LIBS:conn
-LIBS:linear
-LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
+EESchema Schematic File Version 4
 LIBS:new-joy-board-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -45,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L AZReady_ESP32 U2
+L new-joy:AZReady_ESP32 U2
 U 1 1 5B23C3C4
 P 5600 3900
 F 0 "U2" H 5600 4900 50  0000 C CNN
@@ -56,7 +26,7 @@ F 3 "" H 5250 3900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR01
+L power:GND #PWR01
 U 1 1 5B23D7F0
 P 8400 1500
 F 0 "#PWR01" H 8400 1250 50  0001 C CNN
@@ -67,7 +37,7 @@ F 3 "" H 8400 1500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR02
+L power:+5V #PWR02
 U 1 1 5B23DA07
 P 8400 1200
 F 0 "#PWR02" H 8400 1050 50  0001 C CNN
@@ -78,7 +48,7 @@ F 3 "" H 8400 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L dc_dc_converter U1
+L new-joy:dc_dc_converter U1
 U 1 1 5B23E028
 P 7850 1350
 F 0 "U1" H 7850 1650 60  0000 C CNN
@@ -89,7 +59,7 @@ F 3 "" H 7850 1650 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Screw_Terminal_01x02 J1
+L new-joy-board-rescue:Screw_Terminal_01x02 J1
 U 1 1 5B23E0D2
 P 6850 1300
 F 0 "J1" H 6850 1400 50  0000 C CNN
@@ -100,7 +70,7 @@ F 3 "" H 6850 1300 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR03
+L power:+5V #PWR03
 U 1 1 5B2501A9
 P 4650 4800
 F 0 "#PWR03" H 4650 4650 50  0001 C CNN
@@ -111,7 +81,7 @@ F 3 "" H 4650 4800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR04
+L power:GND #PWR04
 U 1 1 5B2501EA
 P 6700 3600
 F 0 "#PWR04" H 6700 3350 50  0001 C CNN
@@ -122,7 +92,7 @@ F 3 "" H 6700 3600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR05
+L power:+12V #PWR05
 U 1 1 5B2502BB
 P 7050 1200
 F 0 "#PWR05" H 7050 1050 50  0001 C CNN
@@ -133,7 +103,7 @@ F 3 "" H 7050 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L AZ1117-3.3 U3
+L new-joy-board-rescue:AZ1117-3.3 U3
 U 1 1 5B250E5A
 P 9350 1200
 F 0 "U3" H 9200 1325 50  0000 C CNN
@@ -144,7 +114,7 @@ F 3 "" H 9350 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L D D1
+L new-joy-board-rescue:D D1
 U 1 1 5B25103F
 P 9350 850
 F 0 "D1" H 9350 950 50  0000 C CNN
@@ -155,7 +125,7 @@ F 3 "" H 9350 850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR07
+L power:+5V #PWR07
 U 1 1 5B251122
 P 8900 1200
 F 0 "#PWR07" H 8900 1050 50  0001 C CNN
@@ -166,7 +136,7 @@ F 3 "" H 8900 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR08
+L power:GND #PWR08
 U 1 1 5B251145
 P 9350 1500
 F 0 "#PWR08" H 9350 1250 50  0001 C CNN
@@ -177,7 +147,7 @@ F 3 "" H 9350 1500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR09
+L power:+3.3V #PWR09
 U 1 1 5B251203
 P 10000 1200
 F 0 "#PWR09" H 10000 1050 50  0001 C CNN
@@ -192,7 +162,7 @@ SCL0ESP
 Text Label 4600 4100 0    60   ~ 0
 SDA0ESP
 $Comp
-L Conn_01x04 J2
+L new-joy-board-rescue:Conn_01x04 J2
 U 1 1 5B25176E
 P 1750 6100
 F 0 "J2" H 1750 6300 50  0000 C CNN
@@ -207,7 +177,7 @@ SDA0BUF
 Text Label 1150 6200 0    60   ~ 0
 SCL0BUF
 $Comp
-L GND #PWR010
+L power:GND #PWR010
 U 1 1 5B251B24
 P 1050 6300
 F 0 "#PWR010" H 1050 6050 50  0001 C CNN
@@ -218,7 +188,7 @@ F 3 "" H 1050 6300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R1
+L new-joy-board-rescue:R R1
 U 1 1 5B2525BD
 P 3950 3350
 F 0 "R1" V 4030 3350 50  0000 C CNN
@@ -229,7 +199,7 @@ F 3 "" H 3950 3350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R2
+L new-joy-board-rescue:R R2
 U 1 1 5B25261D
 P 3950 4150
 F 0 "R2" V 4030 4150 50  0000 C CNN
@@ -244,7 +214,7 @@ SCL0ESP
 Text Label 3950 4500 0    60   ~ 0
 SDA0ESP
 $Comp
-L +3.3V #PWR011
+L power:+3.3V #PWR011
 U 1 1 5B252734
 P 3950 3200
 F 0 "#PWR011" H 3950 3050 50  0001 C CNN
@@ -255,7 +225,7 @@ F 3 "" H 3950 3200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR012
+L power:+3.3V #PWR012
 U 1 1 5B252763
 P 3950 4000
 F 0 "#PWR012" H 3950 3850 50  0001 C CNN
@@ -266,7 +236,7 @@ F 3 "" H 3950 4000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L MPU6050_Breakout U5
+L new-joy:MPU6050_Breakout U5
 U 1 1 5B25335B
 P 3850 5900
 F 0 "U5" H 3850 6450 60  0000 C CNN
@@ -281,7 +251,7 @@ SCL0ESP
 Text Label 4000 5850 0    60   ~ 0
 SDA0ESP
 $Comp
-L +3.3V #PWR013
+L power:+3.3V #PWR013
 U 1 1 5B25365F
 P 4650 5550
 F 0 "#PWR013" H 4650 5400 50  0001 C CNN
@@ -292,7 +262,7 @@ F 3 "" H 4650 5550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR014
+L power:GND #PWR014
 U 1 1 5B25368E
 P 4650 5650
 F 0 "#PWR014" H 4650 5400 50  0001 C CNN
@@ -303,7 +273,7 @@ F 3 "" H 4650 5650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C1
+L new-joy-board-rescue:C C1
 U 1 1 5B253942
 P 8900 1350
 F 0 "C1" H 8925 1450 50  0000 L CNN
@@ -314,7 +284,7 @@ F 3 "" H 8900 1350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C2
+L new-joy-board-rescue:C C2
 U 1 1 5B253992
 P 10000 1350
 F 0 "C2" H 10025 1450 50  0000 L CNN
@@ -329,7 +299,7 @@ NoConn ~ 4000 6150
 NoConn ~ 4000 6050
 NoConn ~ 4000 5950
 $Comp
-L +5V #PWR015
+L power:+5V #PWR015
 U 1 1 5B2558CE
 P 1050 6100
 F 0 "#PWR015" H 1050 5950 50  0001 C CNN
@@ -340,7 +310,7 @@ F 3 "" H 1050 6100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L P82B715 U4
+L new-joy:P82B715 U4
 U 1 1 5B2560BB
 P 3650 2250
 F 0 "U4" H 3650 2550 60  0000 C CNN
@@ -351,7 +321,7 @@ F 3 "" H 3650 2250 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR016
+L power:+5V #PWR016
 U 1 1 5B256249
 P 3250 2050
 F 0 "#PWR016" H 3250 1900 50  0001 C CNN
@@ -362,7 +332,7 @@ F 3 "" H 3250 2050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR017
+L power:GND #PWR017
 U 1 1 5B256281
 P 4050 2350
 F 0 "#PWR017" H 4050 2100 50  0001 C CNN
@@ -381,7 +351,7 @@ SDA0ESP
 Text Label 4050 2250 0    60   ~ 0
 SCL0ESP
 $Comp
-L +5V #PWR018
+L power:+5V #PWR018
 U 1 1 5B265432
 P 1300 900
 F 0 "#PWR018" H 1300 750 50  0001 C CNN
@@ -392,7 +362,7 @@ F 3 "" H 1300 900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR019
+L power:+5V #PWR019
 U 1 1 5B265470
 P 1300 1700
 F 0 "#PWR019" H 1300 1550 50  0001 C CNN
@@ -407,7 +377,7 @@ SCL0BUF
 Text Label 1300 2100 0    60   ~ 0
 SDA0BUF
 $Comp
-L Conn_01x04 J5
+L new-joy-board-rescue:Conn_01x04 J5
 U 1 1 5B26748D
 P 1750 5100
 F 0 "J5" H 1750 5300 50  0000 C CNN
@@ -422,7 +392,7 @@ SDA0BUF
 Text Label 1150 5200 0    60   ~ 0
 SCL0BUF
 $Comp
-L GND #PWR020
+L power:GND #PWR020
 U 1 1 5B267499
 P 1050 5300
 F 0 "#PWR020" H 1050 5050 50  0001 C CNN
@@ -433,7 +403,7 @@ F 3 "" H 1050 5300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR021
+L power:+5V #PWR021
 U 1 1 5B26749F
 P 1050 5100
 F 0 "#PWR021" H 1050 4950 50  0001 C CNN
@@ -444,7 +414,7 @@ F 3 "" H 1050 5100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x04 J4
+L new-joy-board-rescue:Conn_01x04 J4
 U 1 1 5B2674C8
 P 1750 4150
 F 0 "J4" H 1750 4350 50  0000 C CNN
@@ -459,7 +429,7 @@ SDA0BUF
 Text Label 1150 4250 0    60   ~ 0
 SCL0BUF
 $Comp
-L GND #PWR022
+L power:GND #PWR022
 U 1 1 5B2674D4
 P 1050 4350
 F 0 "#PWR022" H 1050 4100 50  0001 C CNN
@@ -470,7 +440,7 @@ F 3 "" H 1050 4350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR023
+L power:+5V #PWR023
 U 1 1 5B2674DA
 P 1050 4150
 F 0 "#PWR023" H 1050 4000 50  0001 C CNN
@@ -481,7 +451,7 @@ F 3 "" H 1050 4150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x04 J3
+L new-joy-board-rescue:Conn_01x04 J3
 U 1 1 5B267501
 P 1750 3250
 F 0 "J3" H 1750 3450 50  0000 C CNN
@@ -496,7 +466,7 @@ SDA0BUF
 Text Label 1150 3350 0    60   ~ 0
 SCL0BUF
 $Comp
-L GND #PWR024
+L power:GND #PWR024
 U 1 1 5B26750D
 P 1050 3450
 F 0 "#PWR024" H 1050 3200 50  0001 C CNN
@@ -507,7 +477,7 @@ F 3 "" H 1050 3450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR025
+L power:+5V #PWR025
 U 1 1 5B267513
 P 1050 3250
 F 0 "#PWR025" H 1050 3100 50  0001 C CNN
@@ -518,7 +488,7 @@ F 3 "" H 1050 3250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L MAX3072E U6
+L new-joy-board-rescue:MAX3072E U6
 U 1 1 5B268A5A
 P 8750 3850
 F 0 "U6" H 8450 4200 50  0000 L CNN
@@ -529,7 +499,7 @@ F 3 "" H 8750 3850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3V3 #PWR026
+L power:+3V3 #PWR026
 U 1 1 5B268E4C
 P 8750 3450
 F 0 "#PWR026" H 8750 3300 50  0001 C CNN
@@ -540,7 +510,7 @@ F 3 "" H 8750 3450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR027
+L power:GND #PWR027
 U 1 1 5B268E96
 P 8750 4250
 F 0 "#PWR027" H 8750 4000 50  0001 C CNN
@@ -600,7 +570,7 @@ Wire Wire Line
 Wire Wire Line
 	4000 5550 4650 5550
 Wire Wire Line
-	8900 1500 10000 1500
+	8900 1500 9350 1500
 Connection ~ 9350 1500
 Wire Wire Line
 	3250 2150 2750 2150
@@ -633,7 +603,7 @@ Wire Wire Line
 Wire Wire Line
 	8350 3750 8350 3950
 $Comp
-L +3V3 #PWR028
+L power:+3V3 #PWR028
 U 1 1 5B2693C9
 P 8000 3950
 F 0 "#PWR028" H 8000 3800 50  0001 C CNN
@@ -652,7 +622,7 @@ Wire Wire Line
 Wire Wire Line
 	7350 4050 8350 4050
 $Comp
-L GND #PWR029
+L power:GND #PWR029
 U 1 1 5B26A7E9
 P 10000 4200
 F 0 "#PWR029" H 10000 3950 50  0001 C CNN
@@ -667,7 +637,7 @@ Wire Wire Line
 Wire Wire Line
 	10000 3750 10000 4200
 $Comp
-L R R3
+L new-joy-board-rescue:R R3
 U 1 1 5B26AB70
 P 9650 3900
 F 0 "R3" V 9730 3900 50  0000 C CNN
@@ -678,7 +648,7 @@ F 3 "" H 9650 3900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9150 3750 9850 3750
+	9150 3750 9650 3750
 Wire Wire Line
 	9850 3750 9850 3850
 Wire Wire Line
@@ -689,14 +659,14 @@ Wire Wire Line
 Wire Wire Line
 	9400 3950 9400 4050
 Wire Wire Line
-	9400 4050 9850 4050
+	9400 4050 9650 4050
 Wire Wire Line
 	9850 4050 9850 3950
 Wire Wire Line
 	9850 3950 10250 3950
 Connection ~ 9650 4050
 $Comp
-L Screw_Terminal_01x03 J6
+L new-joy-board-rescue:Screw_Terminal_01x03 J6
 U 1 1 5B26BC09
 P 10450 3850
 F 0 "J6" H 10450 4050 50  0000 C CNN
@@ -707,7 +677,7 @@ F 3 "" H 10450 3850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L POT_TRIM RV1
+L new-joy-board-rescue:POT_TRIM RV1
 U 1 1 5B26BF60
 P 1300 1050
 F 0 "RV1" V 1125 1050 50  0000 C CNN
@@ -718,7 +688,7 @@ F 3 "" H 1300 1050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L POT_TRIM RV2
+L new-joy-board-rescue:POT_TRIM RV2
 U 1 1 5B26C0B7
 P 1300 1850
 F 0 "RV2" V 1125 1850 50  0000 C CNN
@@ -733,7 +703,7 @@ Wire Wire Line
 Wire Wire Line
 	1300 2000 1300 2100
 $Comp
-L GND #PWR?
+L power:GND #PWR?
 U 1 1 5B26B9FA
 P 7050 1500
 F 0 "#PWR?" H 7050 1250 50  0001 C CNN
@@ -743,4 +713,10 @@ F 3 "" H 7050 1500 50  0001 C CNN
 	1    7050 1500
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	9350 1500 10000 1500
+Wire Wire Line
+	9650 3750 9850 3750
+Wire Wire Line
+	9650 4050 9850 4050
 $EndSCHEMATC
