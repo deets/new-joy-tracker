@@ -1,5 +1,25 @@
+* New Joy Sensor Board
 
-* Price Calculation
+This is documentation for the sensor board I'm developing.
+
+** Sensor Cable Color Coding
+
+I use a 5-wire cable to support the external pressure sensors.
+
+The following table lists the assignment of functions to color:
+
+|--------+----------|
+| Color  | Function |
+|--------+----------|
+| Black  | GND      |
+| Brown  | 5V       |
+| Grey   | 3.3V     |
+| Yellow | SDA      |
+| Blue   | SCL      |
+|--------+----------|
+
+
+** Price Calculation
 
 All calculations are based on a total of 20 Boards.
 
@@ -12,17 +32,17 @@ All calculations are based on a total of 20 Boards.
 
 ** PCB 
 
- - https://portal.multi-circuit-boards.eu/
- - [[https://www.amazon.de/gp/product/B0178DX1ZC/ref%3Doh_aui_search_detailpage?ie%3DUTF8&psc%3D1][DC/DC converter]]
- - [[https://www.reichelt.de/OeLFLEX-CLASSIC/CL100-5G0-5-50/3/index.html?ACTION%3D3&LA%3D3&ARTICLE%3D165213&GROUPID%3D7698&trstct%3Dvrt_pdn][5 wire cable]]
- - [[https://e2e.ti.com/support/interface/i2c/f/390/t/615703?P82B715-Not-reading#][P82B715 setup example]]
- - [[http://www.mathertel.de/Arduino/DMXShield.aspx][Good explanation of DMX transmitter setup]]
- - [[https://www.youtube.com/watch?v%3D8NDq6hC9KJo][ESP32 power consumption assessment]]
- - [[https://github.com/clacktronics/pyb_dmx/blob/master/dmx.py][Crappy but useful uPy implementation of DMX]]
- - [[https://de.wikipedia.org/wiki/DMX_(Lichttechnik)][DMX connector assignment]]
- - [[https://www.element14.com/community/groups/open-source-hardware/blog/2017/08/24/dmx-explained-dmx512-and-rs-485-protocol-detail-for-lighting-applications][Nice DMX512 intro]]
- - [[https://www.reichelt.de/PT15-Pihertrimmer-15mm/PT-15-L-10K/3/index.html?ACTION%3D3&LA%3D446&ARTICLE%3D14951&GROUPID%3D3128&artnr%3DPT%2B15-L%2B10K&SEARCH%3Dtrim%252Bpoti%252B10K&trstct%3Dpos_0][Trimm-Poti 10K]]
- - [[https://www.reichelt.de/Elkos-SMD-Low-ESR-105-C/SMD-ELKO-10-35/3/index.html?ACTION%3D3&LA%3D446&ARTICLE%3D31907&GROUPID%3D4001&artnr%3DSMD%2BELKO%2B10%252F35&SEARCH%3Dsmd%252Belko&trstct%3Dpos_1][SMD Elko]]
+  - https://portal.multi-circuit-boards.eu/
+  - [[https://www.amazon.de/gp/product/B0178DX1ZC/ref%3Doh_aui_search_detailpage?ie%3DUTF8&psc%3D1][DC/DC converter]]
+  - [[https://www.reichelt.de/OeLFLEX-CLASSIC/CL100-5G0-5-50/3/index.html?ACTION%3D3&LA%3D3&ARTICLE%3D165213&GROUPID%3D7698&trstct%3Dvrt_pdn][5 wire cable]]
+  - [[https://e2e.ti.com/support/interface/i2c/f/390/t/615703?P82B715-Not-reading#][P82B715 setup example]]
+  - [[http://www.mathertel.de/Arduino/DMXShield.aspx][Good explanation of DMX transmitter setup]]
+  - [[https://www.youtube.com/watch?v%3D8NDq6hC9KJo][ESP32 power consumption assessment]]
+  - [[https://github.com/clacktronics/pyb_dmx/blob/master/dmx.py][Crappy but useful uPy implementation of DMX]]
+  - [[https://de.wikipedia.org/wiki/DMX_(Lichttechnik)][DMX connector assignment]]
+  - [[https://www.element14.com/community/groups/open-source-hardware/blog/2017/08/24/dmx-explained-dmx512-and-rs-485-protocol-detail-for-lighting-applications][Nice DMX512 intro]]
+  - [[https://www.reichelt.de/PT15-Pihertrimmer-15mm/PT-15-L-10K/3/index.html?ACTION%3D3&LA%3D446&ARTICLE%3D14951&GROUPID%3D3128&artnr%3DPT%2B15-L%2B10K&SEARCH%3Dtrim%252Bpoti%252B10K&trstct%3Dpos_0][Trimm-Poti 10K]]
+  - [[https://www.reichelt.de/Elkos-SMD-Low-ESR-105-C/SMD-ELKO-10-35/3/index.html?ACTION%3D3&LA%3D446&ARTICLE%3D31907&GROUPID%3D4001&artnr%3DSMD%2BELKO%2B10%252F35&SEARCH%3Dsmd%252Belko&trstct%3Dpos_1][SMD Elko]]
 
 *** Pull up calculation
 
@@ -49,22 +69,20 @@ For our use-case with up to 4 devices connected, the calculation should be
 
 20pF * 4 + (100pF * 4) = 500pF -> 0.000001 / (0.000000000500) = 2KOhm
 
-* ESP32
+** ESP32
 
-** Physical
+*** Physical
 | Pin | Function |
 |-----+----------|
 |  12 | SCL      |
 |  14 | SDA      |
 
-** Useful links
+*** Useful links
 
- - [[http://esp32.net/#Hardware][Overview of boards from espressif themselves]]
- - [[http://playground.arduino.cc/Main/MPU-6050][MPU6050 programming with the Arduino]]
+  - [[http://esp32.net/#Hardware][Overview of boards from espressif themselves]]
+  - [[http://playground.arduino.cc/Main/MPU-6050][MPU6050 programming with the Arduino]]
 
-** How to go to repl
-
-* References
+*** References
 
 bme280 code pilfered from
 
