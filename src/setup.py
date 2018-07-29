@@ -100,8 +100,8 @@ def main(name="BOB\0"):
     protocol_buffer = protocol.buffer
     then = time.time()
     while True:
-        pressure_sensor.read_compensated_data(bmp_data)
-        protocol.message(bmp_data[0], bmp_data[1])
+        # pressure_sensor.read_compensated_data(bmp_data)
+        # protocol.message(bmp_data[0], bmp_data[1])
         s.sendto(protocol_buffer, address)
         if time.time() - then > 1:
             print(gc.mem_free())
