@@ -14,7 +14,6 @@ class Hub:
 
     def __init__(self, port=PORT):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        #self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, self.sndbuf_size)
         self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, True)
         self._socket.bind(("", port))
 
