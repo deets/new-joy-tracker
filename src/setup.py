@@ -14,9 +14,10 @@ SCL = 27
 SDA = 26
 
 PORT = 5000
+CONNECT_TIMEOUT = 100
 
 KNOWN_NETWORKS = {
-    b'TP-LINK_2.4GHz_BBADE9': b'51790684',
+    b'TP-LINK_2.4GHz_BBADE9': (b'51790684', '192.168.2.104'),
 }
 
 def setup_i2c():
@@ -58,46 +59,52 @@ def setup_wifi():
     broadcast_address = None
     for name, *_ in networks:
         if name in KNOWN_NETWORKS:
-            nic.connect(name, KNOWN_NETWORKS[name])
+            password, destination_address = KNOWN_NETWORKS[name]
+            nic.connect(name, password)
             print("Connected to {}".format(name.decode("ascii")))
-            ip, netmask, _, _ = nic.ifconfig()
-            bca_bits = ip2bits(ip)
-            netmask_bits = ip2bits(netmask)
-            bca_bits &= netmask_bits
-            bca_bits |= ~netmask_bits
-            broadcast_address = bits2ip(bca_bits)
-    return nic, broadcast_address
+            break
+    else:
+        raise Exception("Couldn't connect to WIFI network!")
+    return nic, destination_address
 
 
-def setup_socket(nic):
-    sock = socket.socket(
-        socket.AF_INET,
-        socket.SOCK_DGRAM
-    )
+def setup_socket(nic, destination_address):
     while not nic.isconnected():
         time.sleep(.1)
-    sock.settimeout(2.0)
-    ip, *_ = nic.ifconfig()
-    sock.bind((ip, PORT))
+
+    sock = socket.socket()
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    for _ in range(CONNECT_TIMEOUT):
+        try:
+            sock.connect((destination_address, PORT))
+        except OSError as e:
+            sock.close()
+            time.sleep(1)
+            print("socket connect failed, retry")
+        else:
+            break
     return sock
 
 
 def setup_all():
     i2c = setup_i2c()
-    pressure_sensor = setup_bmp280(i2c)
+    #pressure_sensor = setup_bmp280(i2c)
     mpu = setup_mpu(i2c)
-    return pressure_sensor, mpu
+    return None, mpu
 
 
 def main(name="BOB\0"):
     pressure_sensor, mpu = setup_all()
-    nic, broadcast_address = setup_wifi()
-    s = setup_socket(nic)
+    nic, destination_address = setup_wifi()
+    s = setup_socket(nic, destination_address, )
+    bmp_data = array.array("i", [0, 0, 0])
+
     protocol = Protocol(name)
     bmp_data = array.array("i", [0, 0, 0])
     address = (broadcast_address, PORT)
     protocol_buffer = protocol.buffer
     while True:
-        pressure_sensor.read_compensated_data(bmp_data)
-        protocol.message(bmp_data[0], bmp_data[1])
-        s.sendto(protocol_buffer, address)
+        #pressure_sensor.read_compensated_data(bmp_data)
+        mpu.read_sensors()
+        s.write(mpu.sensors)
