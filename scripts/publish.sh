@@ -43,10 +43,12 @@ def tag(path):
         outf.write(content_sum)
 
 
-def collect_files(src_dir, force=False):
+def collect_files(src_dir, force=False, files=[]):
     def take_file(name):
         full_path = os.path.join(src_dir, name)
-        return name.endswith(".py") and (force or changed(full_path))
+        return name.endswith(".py") \
+          and (force or changed(full_path)) \
+          and (not files or name in files)
 
     return [os.path.join(src_dir, name)
                 for name in os.listdir(src_dir)
@@ -79,8 +81,13 @@ def main():
         default="/dev/ttyUSB0",
         help="USB serial port to use.",
     )
+    parser.add_argument(
+        "files",
+        nargs="*",
+        help="List of filenames to limit publishing to",
+    )
     opts = parser.parse_args()
-    files = collect_files(SRC_DIR, opts.force)
+    files = collect_files(SRC_DIR, opts.force, opts.files)
     for file in files:
         publish(file, opts.port)
 
