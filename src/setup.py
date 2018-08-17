@@ -3,6 +3,7 @@ import machine
 import time
 import network
 import socket
+import struct
 
 from bme280 import BME280
 from mpu6050 import MPU
@@ -106,5 +107,6 @@ def main(name="BOB\0"):
     protocol_buffer = protocol.buffer
     while True:
         #pressure_sensor.read_compensated_data(bmp_data)
-        mpu.read_sensors()
-        s.write(mpu.sensors)
+        data = mpu.read_sensors_scaled()
+        print(data)
+        s.write(struct.pack("<fffhfff", *data))
