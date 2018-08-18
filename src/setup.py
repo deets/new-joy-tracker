@@ -5,7 +5,7 @@ import network
 import socket
 import struct
 
-from bme280 import BME280
+from bme280 import BME280, BME280_I2CADDR
 from mpu6050 import MPU
 from protocol import Protocol
 
@@ -29,7 +29,11 @@ def setup_i2c():
 
 
 def setup_bmp280(i2c):
-    pressure_sensor = BME280(i2c=i2c)
+    if BME280_I2CADDR in i2c.scan():
+        pressure_sensor = BME280(i2c=i2c)
+    else:
+        pressure_sensor = None
+        print('no pressure sensor detected')
     return pressure_sensor
 
 
