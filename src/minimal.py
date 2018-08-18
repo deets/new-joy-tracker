@@ -65,15 +65,21 @@ def main():
     message = "foobar"
     then = time.time()
     count = 0
+    print(message, address)
+
     while True:
-        #print(message, address)
         try:
             s.sendto(message, address)
+
             count += 1
         except OSError:
             print(count)
             raise
+        if (count % 1000) == 0:
+            print(".")
         # if time.time() - then > 1:
         #     print(gc.mem_free())
-        gc.collect()
+        machine.idle()
+        time.sleep_ms(20)
+        #gc.collect()
         # then += 1
