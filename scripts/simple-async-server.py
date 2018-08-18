@@ -5,8 +5,9 @@ from socket import socket, SO_REUSEADDR, SOL_SOCKET
 from asyncio import Task, coroutine, get_event_loop
 
 class Peer(object):
-    FORMAT = "<IHIIIfffhfff" # NAME, SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
-                             # ACC_X, ACC_Y, ACC_Z, TEMP, GYR_X, GYR_Y, GYR_Z
+    FORMAT = "<cIHIIIfffhfffB" # START, NAME, SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
+                               # ACC_X, ACC_Y, ACC_Z, TEMP, GYR_X, GYR_Y, GYR_Z
+                               # CHECKSUM
 
     def __init__(self, loop, server, sock, name):
         self._loop = loop
@@ -17,17 +18,31 @@ class Peer(object):
 
     async def _peer_loop(self):
         packet_length = struct.calcsize(self.FORMAT)
+        invalid_count = 0
         while True:
             buf = await self._loop.sock_recv(self._sock, 1024)
             if buf == b'':
                 break
             while len(buf) >= packet_length:
+                if buf[0] != ord('#'):
+                    invalid_count += 1
+                    # try & forward the buffer to
+                    # the beginning of a potential message
+                    if buf.find(b'#') != -1:
+                        buf = buf[buf.find(b'#'):]
+                        continue
                 message = buf[:packet_length]
                 buf = buf[packet_length:]
-                name, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z = \
+                start, name, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z, checksum = \
                   struct.unpack(self.FORMAT, message)
 
-                print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f}".format(pressure, g_x, g_y, g_z))
+                pressure /= 25600.0
+                print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {}".format(
+                    pressure,
+                    g_x, g_y, g_z,
+                    invalid_count
+                    )
+               )
 
 
 class Server(object):

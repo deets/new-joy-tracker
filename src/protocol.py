@@ -22,7 +22,8 @@ class Protocol:
         """
         assert len(name) == 4
         self._name = ustruct.unpack("<I", ustruct.pack("ssss", *name))[0]
-        self.buffer = bytearray(ustruct.calcsize(self.FORMAT))
+        # startchar + datagram + checksum
+        self.buffer = bytearray(ustruct.calcsize(self.FORMAT) + 2)
         self._count = 0
         self.bmp_data = array.array("i", [0, 0, 0])
 
@@ -40,7 +41,7 @@ class Protocol:
 
         ustruct.pack_into(
             self.FORMAT,
-            self.buffer, 0,
+            self.buffer, 1,
             self._name,
             self._count,
             time.ticks_ms(),
@@ -50,4 +51,6 @@ class Protocol:
             temp,
             gyr_x, gyr_y, gyr_z,
         )
+        self.buffer[0] = ord('#')
+        self.buffer[-1] = sum(self.buffer[1:-1]) & 0xff
         self._count += 1
