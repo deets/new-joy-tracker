@@ -1,0 +1,2 @@
+alias p=./scripts/publish.sh
+alias r=./scripts/repl.sh
