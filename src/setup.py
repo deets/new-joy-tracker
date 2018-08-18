@@ -16,6 +16,7 @@ SDA = 26
 
 PORT = 5000
 CONNECT_TIMEOUT = 100
+RESET_COUNT = 10 # after these, we try to reset the board for reconnection
 
 KNOWN_NETWORKS = {
     b'TP-LINK_2.4GHz_BBADE9': (b'51790684', '192.168.2.104'),
@@ -93,6 +94,7 @@ def main(name="BOB\0"):
     pressure_sensor, mpu = setup_all()
     nic, destination_address = setup_wifi()
     protocol = Protocol(name)
+    reconnect_count = 0
     while True:
         print("connecting...")
         try:
@@ -101,5 +103,8 @@ def main(name="BOB\0"):
                 protocol.read_sensors(pressure_sensor, mpu)
                 s.write(protocol.buffer)
         except OSError:
-            s.close()
+            reconnect_count += 1
+            if reconnect_count > RESET_COUNT:
+                print("resetting hard")
+                machine.reset()
             time.sleep(1)
