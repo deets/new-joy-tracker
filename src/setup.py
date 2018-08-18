@@ -57,7 +57,6 @@ def setup_wifi():
     nic = network.WLAN(network.STA_IF)
     nic.active(True)
     networks = nic.scan()
-    broadcast_address = None
     for name, *_ in networks:
         if name in KNOWN_NETWORKS:
             password, destination_address = KNOWN_NETWORKS[name]
@@ -103,7 +102,6 @@ def main(name="BOB\0"):
 
     protocol = Protocol(name)
     bmp_data = array.array("i", [0, 0, 0])
-    address = (broadcast_address, PORT)
     protocol_buffer = protocol.buffer
     while True:
         #pressure_sensor.read_compensated_data(bmp_data)
