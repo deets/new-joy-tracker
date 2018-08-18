@@ -74,16 +74,7 @@ def setup_socket(nic, destination_address):
 
     sock = socket.socket()
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-    for _ in range(CONNECT_TIMEOUT):
-        try:
-            sock.connect((destination_address, PORT))
-        except OSError as e:
-            sock.close()
-            time.sleep(1)
-            print("socket connect failed, retry")
-        else:
-            break
+    sock.connect((destination_address, PORT))
     return sock
 
 
@@ -97,14 +88,19 @@ def setup_all():
 def main(name="BOB\0"):
     pressure_sensor, mpu = setup_all()
     nic, destination_address = setup_wifi()
-    s = setup_socket(nic, destination_address, )
     bmp_data = array.array("i", [0, 0, 0])
-
     protocol = Protocol(name)
     bmp_data = array.array("i", [0, 0, 0])
     protocol_buffer = protocol.buffer
+
     while True:
-        #pressure_sensor.read_compensated_data(bmp_data)
-        data = mpu.read_sensors_scaled()
-        print(data)
-        s.write(struct.pack("<fffhfff", *data))
+        print("connecting...")
+        try:
+            s = setup_socket(nic, destination_address, )
+            while True:
+                data = mpu.read_sensors_scaled()
+                print(data)
+                s.write(struct.pack("<fffhfff", *data))
+        except OSError:
+            s.close()
+            time.sleep(1)
