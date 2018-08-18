@@ -80,27 +80,22 @@ def setup_socket(nic, destination_address):
 
 def setup_all():
     i2c = setup_i2c()
-    #pressure_sensor = setup_bmp280(i2c)
+    pressure_sensor = setup_bmp280(i2c)
     mpu = setup_mpu(i2c)
-    return None, mpu
+    return pressure_sensor, mpu
 
 
 def main(name="BOB\0"):
     pressure_sensor, mpu = setup_all()
     nic, destination_address = setup_wifi()
-    bmp_data = array.array("i", [0, 0, 0])
     protocol = Protocol(name)
-    bmp_data = array.array("i", [0, 0, 0])
-    protocol_buffer = protocol.buffer
-
     while True:
         print("connecting...")
         try:
             s = setup_socket(nic, destination_address, )
             while True:
-                data = mpu.read_sensors_scaled()
-                print(data)
-                s.write(struct.pack("<fffhfff", *data))
+                protocol.read_sensors(pressure_sensor, mpu)
+                s.write(protocol.buffer)
         except OSError:
             s.close()
             time.sleep(1)

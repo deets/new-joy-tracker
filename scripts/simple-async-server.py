@@ -5,7 +5,8 @@ from socket import socket, SO_REUSEADDR, SOL_SOCKET
 from asyncio import Task, coroutine, get_event_loop
 
 class Peer(object):
-    FORMAT = "<fffhfff"
+    FORMAT = "<IHIIIfffhfff" # NAME, SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
+                             # ACC_X, ACC_Y, ACC_Z, TEMP, GYR_X, GYR_Y, GYR_Z
 
     def __init__(self, loop, server, sock, name):
         self._loop = loop
@@ -23,10 +24,10 @@ class Peer(object):
             while len(buf) >= packet_length:
                 message = buf[:packet_length]
                 buf = buf[packet_length:]
-                acc_x, acc_y, acc_z, temp, g_x, g_y, g_z = \
+                name, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z = \
                   struct.unpack(self.FORMAT, message)
 
-                print("{: > 10.3f} {: > 10.3f} {: > 10.3f}".format(g_x, g_y, g_z))
+                print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f}".format(pressure, g_x, g_y, g_z))
 
 
 class Server(object):
