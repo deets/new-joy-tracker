@@ -1,24 +1,58 @@
-#!/usr/bin/python3.6
+#!/usr/bin/env python3.6
 import struct
 
 from socket import socket, SO_REUSEADDR, SOL_SOCKET
 from asyncio import Task, coroutine, get_event_loop
+
+from pythonosc import osc_message_builder
+from pythonosc import udp_client
+
+class Deriver():
+
+    def __init__(self):
+        self._last = None
+
+
+    def feed(self, value):
+        res = 0.0
+        if self._last is not None:
+            res = value - self._last
+        self._last = value
+        return res
+
+
+class Asymptoter():
+
+    def __init__(self, decay=0.1):
+        self._value = 0.0
+        self._decay = decay
+
+
+    def feed(self, value):
+        self._value += value
+        self._value -= self._value * self._decay
+        return self._value
+
 
 class Peer(object):
     FORMAT = "<cIHIIIfffhfffB" # START, NAME, SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
                                # ACC_X, ACC_Y, ACC_Z, TEMP, GYR_X, GYR_Y, GYR_Z
                                # CHECKSUM
 
-    def __init__(self, loop, server, sock, name):
+    def __init__(self, loop, server, sock, name, client):
         self._loop = loop
         self.name = name
         self._sock = sock
         self._server = server
+        self._client = client
         Task(self._peer_loop())
 
     async def _peer_loop(self):
         packet_length = struct.calcsize(self.FORMAT)
         invalid_count = 0
+        pressure_deriver = Deriver()
+        pressure_asymptote = Asymptoter()
+
         while True:
             buf = await self._loop.sock_recv(self._sock, 1024)
             if buf == b'':
@@ -37,16 +71,27 @@ class Peer(object):
                   struct.unpack(self.FORMAT, message)
 
                 pressure /= 25600.0
-                print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {}".format(
+                pressure_d = pressure_deriver.feed(pressure)
+                pressure_a = pressure_asymptote.feed(pressure_d)
+
+                print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {}".format(
                     pressure,
+                    pressure_d,
+                    pressure_a,
                     g_x, g_y, g_z,
                     invalid_count
                     )
-               )
+                )
+                b = osc_message_builder.OscMessageBuilder("/filter")
+                b.add_arg(pressure)
+                b.add_arg(pressure_d)
+                b.add_arg(pressure_a)
+
+                self._client.send(b.build())
 
 
 class Server(object):
-    def __init__(self, port):
+    def __init__(self, port, client):
         self._loop = get_event_loop()
         self._serv_sock = socket()
         self._serv_sock.setblocking(0)
@@ -54,6 +99,7 @@ class Server(object):
         self._serv_sock.bind(('', port))
         self._serv_sock.listen(5)
         self._peers = []
+        self._client = client
         Task(self._server())
 
     def remove(self, peer):
@@ -68,7 +114,7 @@ class Server(object):
         while True:
             peer_sock, peer_name = await self._loop.sock_accept(self._serv_sock)
             peer_sock.setblocking(0)
-            peer = Peer(self._loop, self, peer_sock, peer_name)
+            peer = Peer(self._loop, self, peer_sock, peer_name, self._client)
             print(peer, "created")
             self._peers.append(peer)
 
@@ -78,7 +124,8 @@ class Server(object):
 
 
 def main():
-    server = Server(5000)
+    client = udp_client.UDPClient('192.168.0.102', 5005)
+    server = Server(5000, client)
     server.run_forever()
 
 if __name__ == '__main__':
