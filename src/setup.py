@@ -102,6 +102,7 @@ def main(name="BOB\0"):
             while True:
                 protocol.read_sensors(pressure_sensor, mpu)
                 s.write(protocol.buffer)
+                time.sleep_ms(20)
         except OSError:
             reconnect_count += 1
             if reconnect_count > RESET_COUNT:
