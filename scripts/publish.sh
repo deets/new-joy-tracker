@@ -5,9 +5,12 @@ import sys
 import argparse
 import subprocess
 import hashlib
+import platform
 
 SRC_DIR = os.path.join(os.path.dirname(__file__), "../src")
 TAG_DIR = "/tmp"
+
+DEFAULT_SERIAL_PORT =  "/dev/tty.SLAB_USBtoUART" if platform.system() == 'Darwin' else "/dev/ttyUSB0"
 
 def hash_file(path):
     content_sum = hashlib.md5()
@@ -78,7 +81,7 @@ def main():
     )
     parser.add_argument(
         "--port",
-        default="/dev/ttyUSB0",
+        default=DEFAULT_SERIAL_PORT,
         help="USB serial port to use.",
     )
     parser.add_argument(
