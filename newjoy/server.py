@@ -93,6 +93,7 @@ class Peer(object):
                 b.add_arg(pressure)
                 b.add_arg(pressure_d)
                 b.add_arg(pressure_a)
+                b.add_arg(g_x)
 
                 message = b.build()
                 self._client.send(message)
