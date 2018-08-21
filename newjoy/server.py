@@ -11,6 +11,8 @@ from pythonosc import udp_client
 DEFAULT_UDP_PORT = 5005
 DEFAULT_SERVER_PORT = 5000
 
+from .util import PackageParser
+
 class Deriver():
 
     def __init__(self):
@@ -63,7 +65,7 @@ class Peer(object):
 
     async def _peer_loop(self):
         packet_length = struct.calcsize(self.FORMAT)
-        invalid_count = 0
+        parser = PackageParser(packet_length)
         pressure_deriver = Deriver()
         pressure_asymptote = Asymptoter()
 
@@ -71,16 +73,7 @@ class Peer(object):
             buf = await self._loop.sock_recv(self._sock, 1024)
             if buf == b'':
                 break
-            while len(buf) >= packet_length:
-                if buf[0] != ord('#'):
-                    invalid_count += 1
-                    # try & forward the buffer to
-                    # the beginning of a potential message
-                    if buf.find(b'#') != -1:
-                        buf = buf[buf.find(b'#'):]
-                        continue
-                message = buf[:packet_length]
-                buf = buf[packet_length:]
+            for message in parser.feed(buf):
                 start, name, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z, checksum = \
                   struct.unpack(self.FORMAT, message)
 
@@ -93,7 +86,7 @@ class Peer(object):
                     pressure_d,
                     pressure_a,
                     g_x, g_y, g_z,
-                    invalid_count
+                    parser.invalid_count
                     )
                 )
                 b = osc_message_builder.OscMessageBuilder("/filter")
