@@ -81,19 +81,23 @@ class Peer(object):
                 pressure_d = pressure_deriver.feed(pressure)
                 pressure_a = pressure_asymptote.feed(pressure_d)
 
-                print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {}".format(
+                print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {}".format(
                     pressure,
                     pressure_d,
                     pressure_a,
                     g_x, g_y, g_z,
-                    parser.invalid_count
+                    parser.invalid_count,
+                    seq,
                     )
                 )
                 b = osc_message_builder.OscMessageBuilder("/filter")
                 b.add_arg(pressure)
-                b.add_arg(pressure_d)
-                b.add_arg(pressure_a)
                 b.add_arg(g_x)
+                b.add_arg(g_y)
+                b.add_arg(g_z)
+                b.add_arg(acc_x)
+                b.add_arg(acc_y)
+                b.add_arg(acc_z)
 
                 message = b.build()
                 self._client.send(message)

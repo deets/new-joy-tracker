@@ -16,18 +16,21 @@ from pythonosc import dispatcher
 ROLLOVER = 1000
 
 @gen.coroutine
-def update(source, x, pressure, gyro_x):
-    source.stream(
-        dict(
-            x=[x],
-            pressure=[pressure],
-            gyro_x=[gyro_x],
-        ),
-        rollover=ROLLOVER
-    )
+def update(source, **kw):
+    item = dict((k, [v]) for k, v in kw.items())
+    source.stream(item, rollover=ROLLOVER)
 
 
-def schedule_update(doc, source, path, pressure, pressure_d, pressure_a, gyro_x):
+def schedule_update(
+        doc, source, path,
+        pressure,
+        gyro_x,
+        gyro_y,
+        gyro_z,
+        acc_x,
+        acc_y,
+        acc_z,
+        ):
     x = datetime.now()
     # but update the document from callback
     doc.add_next_tick_callback(
@@ -37,33 +40,43 @@ def schedule_update(doc, source, path, pressure, pressure_d, pressure_a, gyro_x)
             x=x,
             pressure=pressure,
             gyro_x=gyro_x,
+            gyro_y=gyro_y,
+            gyro_z=gyro_z,
+            acc_x=acc_x,
+            acc_y=acc_y,
+            acc_z=acc_z,
         )
     )
 
 
+COLUMNS = ["pressure", "gyro_x", "gyro_y", "gyro_z", "acc_x", "acc_y", "acc_z"]
+
 def main():
     # this must only be modified from a Bokeh session callback
-    source = ColumnDataSource(
-        data=dict(
+    data = dict(
             x=[datetime.now()],
-            pressure=[0],
-            gyro_x=[0],
-        )
+    )
+    for column in COLUMNS:
+        data[column] = [0]
+
+    source = ColumnDataSource(
+        data=data,
     )
 
     # This is important! Save curdoc() to make sure all threads
     # see the same document.
     doc = curdoc()
 
-    p = figure(x_axis_type='datetime')
-    p.line(x='x', y='pressure', source=source)
-
-    gx = figure(x_axis_type='datetime')
-    gx.line(x='x', y='gyro_x', source=source)
+    plots = {}
+    for column in COLUMNS:
+        p = figure(x_axis_type='datetime')
+        p.line(x='x', y=column, source=source)
+        plots[column] = p
 
     l = layout([
-        [p],
-        [gx],
+        [plots["pressure"]],
+        [plots["gyro_x"], plots["gyro_y"], plots["gyro_z"]],
+        [plots["acc_x"], plots["acc_y"], plots["acc_z"]],
         ],
         sizing_mode='stretch_both'
     )
