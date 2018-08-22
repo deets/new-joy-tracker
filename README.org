@@ -79,8 +79,9 @@ For our use-case with up to 4 devices connected, the calculation should be
 
 *** Useful links
 
-  - [[http://esp32.net/#Hardware][Overview of boards from espressif themselves]]
-  - [[http://playground.arduino.cc/Main/MPU-6050][MPU6050 programming with the Arduino]]
+ - [[http://esp32.net/#Hardware][Overview of boards from espressif themselves]]
+ - [[http://playground.arduino.cc/Main/MPU-6050][MPU6050 programming with the Arduino]]
+ - [[https://github.com/kriswiner/ESP32/blob/master/MPU9250_MS5637/MPU9250_MS5637_AHRS.ino][ESP32 IMU Sensor Fusion Project]]
 
 *** References
 
