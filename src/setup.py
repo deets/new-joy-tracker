@@ -93,7 +93,13 @@ def setup_all():
 
 def main(name="BOB\0"):
     pressure_sensor, mpu = setup_all()
-    nic, destination_address = setup_wifi()
+    while True:
+        try:
+            nic, destination_address = setup_wifi()
+            break
+        except Exception:
+            pass
+
     protocol = Protocol(name)
     reconnect_count = 0
     while True:
