@@ -3,7 +3,7 @@ import struct
 import argparse
 import time
 
-from socket import socket, SO_REUSEADDR, SOL_SOCKET
+from socket import socket, SO_REUSEADDR, SOL_SOCKET, SOCK_DGRAM, AF_INET
 from asyncio import Task, coroutine, get_event_loop
 
 from pythonosc import osc_message_builder
@@ -41,115 +41,74 @@ class Asymptoter():
         return self._value
 
 
-class Peer(object):
-    FORMAT = "<cIHIIIfffhfffB" # START, NAME, SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
-                               # ACC_X, ACC_Y, ACC_Z, TEMP, GYR_X, GYR_Y, GYR_Z
-                               # CHECKSUM
-
-    def __init__(
-            self,
-            loop,
-            server,
-            sock,
-            name,
-            client,
-            visualise_callback,
-        ):
-        self._loop = loop
-        self.name = name
-        self._sock = sock
-        self._server = server
-        self._client = client
-        self._visualise_callback = visualise_callback
-        Task(self._peer_loop())
+FORMAT = "<cIHIIIfffhfffB" # START, NAME, SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
+                           # ACC_X, ACC_Y, ACC_Z, TEMP, GYR_X, GYR_Y, GYR_Z
+                           # CHECKSUM
 
 
-    async def _peer_loop(self):
-        packet_length = struct.calcsize(self.FORMAT)
-        parser = PackageParser(packet_length)
-        pressure_deriver = Deriver()
-        pressure_asymptote = Asymptoter()
+def message_processor(client, visualise_callback):
+    packet_length = struct.calcsize(FORMAT)
+    parser = PackageParser(packet_length)
+    last_timestamp = None
 
-        last_timestamp = None
-        while True:
-            buf = await self._loop.sock_recv(self._sock, 1024)
-            if buf == b'':
-                break
-            for message in parser.feed(buf):
-                timestamp = time.monotonic()
-                if last_timestamp is not None:
-                    packet_diff = timestamp - last_timestamp
-                else:
-                    packet_diff = 0
-                last_timestamp = timestamp
+    while True:
+        message = yield
+        timestamp = time.monotonic()
+        if last_timestamp is not None:
+            packet_diff = timestamp - last_timestamp
+        else:
+            packet_diff = 0
+        last_timestamp = timestamp
 
-                start, name, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z, checksum = \
-                  struct.unpack(self.FORMAT, message)
+        start, name, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z, checksum = \
+          struct.unpack(FORMAT, message)
 
-                pressure /= 25600.0
-                pressure_d = pressure_deriver.feed(pressure)
-                pressure_a = pressure_asymptote.feed(pressure_d)
+        pressure /= 25600.0
 
-                print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {} {: > 3.2f}".format(
-                    pressure,
-                    pressure_d,
-                    pressure_a,
-                    g_x, g_y, g_z,
-                    parser.invalid_count,
-                    seq,
-                    packet_diff,
-                    )
-                )
-                b = osc_message_builder.OscMessageBuilder("/filter")
-                b.add_arg(pressure)
-                b.add_arg(g_x)
-                b.add_arg(g_y)
-                b.add_arg(g_z)
-                b.add_arg(acc_x)
-                b.add_arg(acc_y)
-                b.add_arg(acc_z)
-                b.add_arg(packet_diff)
+        print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {} {: > 3.2f}".format(
+            pressure,
+            g_x, g_y, g_z,
+            parser.invalid_count,
+            seq,
+            packet_diff,
+            )
+        )
+        b = osc_message_builder.OscMessageBuilder("/filter")
+        b.add_arg(pressure)
+        b.add_arg(g_x)
+        b.add_arg(g_y)
+        b.add_arg(g_z)
+        b.add_arg(acc_x)
+        b.add_arg(acc_y)
+        b.add_arg(acc_z)
+        b.add_arg(packet_diff)
 
-                message = b.build()
-                self._client.send(message)
-                self._visualise_callback(message)
+        message = b.build()
+        client.send(message)
+        visualise_callback(message)
 
 
 class Server(object):
     def __init__(self, port, client, visualise_callback):
         self._loop = get_event_loop()
-        self._serv_sock = socket()
+        self._serv_sock = socket(AF_INET, SOCK_DGRAM)
+
+        self._message_processor = message_processor(
+            client,
+            visualise_callback
+        )
+        next(self._message_processor)
+
         self._serv_sock.setblocking(0)
         self._serv_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self._serv_sock.bind(('', port))
-        self._serv_sock.listen(5)
-        self._peers = []
-        self._client = client
-        self._visualise_callback = visualise_callback
         Task(self._server())
 
-    def remove(self, peer):
-        self._peers.remove(peer)
-        self.broadcast('Peer %s quit!\n' % (peer.name,))
-
-    def broadcast(self, message):
-        for peer in self._peers:
-            peer.send(message)
 
     async def _server(self):
         while True:
-            peer_sock, peer_name = await self._loop.sock_accept(self._serv_sock)
-            peer_sock.setblocking(0)
-            peer = Peer(
-                self._loop,
-                self,
-                peer_sock,
-                peer_name,
-                self._client,
-                self._visualise_callback
-            )
-            print(peer, "created")
-            self._peers.append(peer)
+            data = await self._loop.sock_recv(self._serv_sock, 1024)
+            self._message_processor.send(data)
 
 
     def run_forever(self):

@@ -19,8 +19,9 @@ CONNECT_TIMEOUT = 100
 RESET_COUNT = 10 # after these, we try to reset the board for reconnection
 
 KNOWN_NETWORKS = {
-    b'AtomExplosion': (b'66869443', '192.168.0.102'),
+    b'AtomExplosion': (b'66869443', '192.168.0.255'),
     b'TP-LINK_2.4GHz_BBADE9': (b'51790684', '192.168.2.104'),
+    b'Schauspielhaus': (b'SH47hK8PwxZ', '192.168.30.34'),
 }
 
 def setup_i2c():
@@ -78,7 +79,7 @@ def setup_socket(nic, destination_address):
     while not nic.isconnected():
         time.sleep(.1)
 
-    sock = socket.socket()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.connect((destination_address, PORT))
     return sock
@@ -105,7 +106,7 @@ def main(name="BOB\0"):
     while True:
         print("connecting...")
         try:
-            s = setup_socket(nic, destination_address, )
+            s = setup_socket(nic, destination_address)
             while True:
                 protocol.read_sensors(pressure_sensor, mpu)
                 s.write(protocol.buffer)
