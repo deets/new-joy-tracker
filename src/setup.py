@@ -19,6 +19,7 @@ CONNECT_TIMEOUT = 100
 RESET_COUNT = 10 # after these, we try to reset the board for reconnection
 
 KNOWN_NETWORKS = {
+    b'AtomExplosion': (b'66869443', '192.168.0.102'),
     b'TP-LINK_2.4GHz_BBADE9': (b'51790684', '192.168.2.104'),
 }
 
