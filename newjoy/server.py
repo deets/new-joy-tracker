@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.6
 import struct
 import argparse
+import time
 
 from socket import socket, SO_REUSEADDR, SOL_SOCKET
 from asyncio import Task, coroutine, get_event_loop
@@ -69,11 +70,19 @@ class Peer(object):
         pressure_deriver = Deriver()
         pressure_asymptote = Asymptoter()
 
+        last_timestamp = None
         while True:
             buf = await self._loop.sock_recv(self._sock, 1024)
             if buf == b'':
                 break
             for message in parser.feed(buf):
+                timestamp = time.monotonic()
+                if last_timestamp is not None:
+                    packet_diff = timestamp - last_timestamp
+                else:
+                    packet_diff = 0
+                last_timestamp = timestamp
+
                 start, name, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z, checksum = \
                   struct.unpack(self.FORMAT, message)
 
@@ -81,13 +90,14 @@ class Peer(object):
                 pressure_d = pressure_deriver.feed(pressure)
                 pressure_a = pressure_asymptote.feed(pressure_d)
 
-                print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {}".format(
+                print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {} {: > 3.2f}".format(
                     pressure,
                     pressure_d,
                     pressure_a,
                     g_x, g_y, g_z,
                     parser.invalid_count,
                     seq,
+                    packet_diff,
                     )
                 )
                 b = osc_message_builder.OscMessageBuilder("/filter")
@@ -98,6 +108,7 @@ class Peer(object):
                 b.add_arg(acc_x)
                 b.add_arg(acc_y)
                 b.add_arg(acc_z)
+                b.add_arg(packet_diff)
 
                 message = b.build()
                 self._client.send(message)

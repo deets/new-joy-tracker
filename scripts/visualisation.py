@@ -30,6 +30,7 @@ def schedule_update(
         acc_x,
         acc_y,
         acc_z,
+        packet_diff,
         ):
     x = datetime.now()
     # but update the document from callback
@@ -45,11 +46,16 @@ def schedule_update(
             acc_x=acc_x,
             acc_y=acc_y,
             acc_z=acc_z,
+            packet_diff=packet_diff,
         )
     )
 
 
-COLUMNS = ["pressure", "gyro_x", "gyro_y", "gyro_z", "acc_x", "acc_y", "acc_z"]
+COLUMNS = ["pressure", "gyro_x", "gyro_y", "gyro_z", "acc_x", "acc_y", "acc_z", "packet_diff"]
+
+GLYPH_TYPES = {
+    "packet_diff": "circle",
+}
 
 def main():
     # this must only be modified from a Bokeh session callback
@@ -69,12 +75,12 @@ def main():
 
     plots = {}
     for column in COLUMNS:
-        p = figure(x_axis_type='datetime')
-        p.line(x='x', y=column, source=source)
+        p = figure(x_axis_type='datetime', y_axis_label=column)
+        getattr(p, GLYPH_TYPES.get(column, "line"))(x='x', y=column, source=source)
         plots[column] = p
 
     l = layout([
-        [plots["pressure"]],
+        [plots["pressure"], plots["packet_diff"]],
         [plots["gyro_x"], plots["gyro_y"], plots["gyro_z"]],
         [plots["acc_x"], plots["acc_y"], plots["acc_z"]],
         ],
