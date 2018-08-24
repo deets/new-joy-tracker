@@ -17,6 +17,7 @@ SDA = 26
 PORT = 5000
 CONNECT_TIMEOUT = 100
 RESET_COUNT = 10 # after these, we try to reset the board for reconnection
+LOOP_SLEEP_MS = 70
 
 KNOWN_NETWORKS = {
     b'AtomExplosion': (b'66869443', '192.168.0.255'),
@@ -110,7 +111,8 @@ def main(name="BOB\0"):
             while True:
                 protocol.read_sensors(pressure_sensor, mpu)
                 s.write(protocol.buffer)
-                time.sleep_ms(20)
+                time.sleep_ms(LOOP_SLEEP_MS)
+                machine.idle()
         except OSError:
             reconnect_count += 1
             if reconnect_count > RESET_COUNT:
