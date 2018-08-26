@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name new-joy-board-rescue)(type Legacy)(uri ${KIPRJMOD}/new-joy-board-rescue.lib)(options "")(descr ""))
+  (lib (name new-joy)(type Legacy)(uri ${KIPRJMOD}/new-joy.lib)(options "")(descr ""))
+)
