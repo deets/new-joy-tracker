@@ -3,8 +3,11 @@ import struct
 import argparse
 import time
 
+from functools import partial
 from socket import socket, SO_REUSEADDR, SOL_SOCKET, SOCK_DGRAM, AF_INET
-from asyncio import Task, coroutine, get_event_loop
+from asyncio import Task, coroutine, get_event_loop, DatagramProtocol
+
+import arpreq
 
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
@@ -88,27 +91,63 @@ def message_processor(client, visualise_callback):
         visualise_callback(message)
 
 
+class NewJoyProtocol(DatagramProtocol):
+
+    def __init__(self, server, *a, **k):
+        super().__init__(*a, **k)
+        self._server = server
+        self._transport = None
+        self._ip2name_mapping = {}
+        self._unknown_gen = self._generate_unknown_names()
+
+
+    def connection_made(self, transport):
+        self._transport = transport
+
+
+    def datagram_received(self, data, addr):
+        print(self._resolve_name(addr[0]))
+        self._server._message_processor.send(data)
+
+
+    def _resolve_name(self, ip):
+        if ip not in self._ip2name_mapping:
+            mac = arpreq.arpreq(ip)
+            if mac is None:
+                mac = next(self._unknown_gen)
+            self._ip2name_mapping[ip] = mac
+        return self._ip2name_mapping[ip]
+
+
+    def _generate_unknown_names(self):
+        """
+        Generate dummy-names for
+        unresolvable mac-addresses
+        """
+        count = 1
+        while True:
+            yield f"unknown-{count}"
+            count += 1
+
+
 class Server(object):
     def __init__(self, port, client, visualise_callback):
         self._loop = get_event_loop()
-        self._serv_sock = socket(AF_INET, SOCK_DGRAM)
-
         self._message_processor = message_processor(
             client,
             visualise_callback
         )
+        # forward to send yield
         next(self._message_processor)
 
-        self._serv_sock.setblocking(0)
-        self._serv_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-        self._serv_sock.bind(('', port))
-        Task(self._server())
+        sock = socket(AF_INET, SOCK_DGRAM)
+        sock.bind(('', port))
 
-
-    async def _server(self):
-        while True:
-            data = await self._loop.sock_recv(self._serv_sock, 1024)
-            self._message_processor.send(data)
+        listen = self._loop.create_datagram_endpoint(
+            partial(NewJoyProtocol, self),
+            sock=sock,
+        )
+        self._loop.run_until_complete(listen) # returns transport, protocol
 
 
     def run_forever(self):

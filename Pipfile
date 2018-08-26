@@ -13,6 +13,7 @@ bokeh = "*"
 nose-progressive = "*"
 nose = "*"
 pylint = "*"
+arpreq = "*"
 
 [requires]
 python_version = "3.6"
