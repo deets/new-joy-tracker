@@ -25,6 +25,8 @@ def update(source, **kw):
 
 def schedule_update(
         doc, source, path,
+        # All following arguments are from the OSC package
+        name,
         pressure,
         gyro_x,
         gyro_y,

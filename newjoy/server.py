@@ -55,7 +55,7 @@ def message_processor(client, visualise_callback):
     last_timestamp = None
 
     while True:
-        message = yield
+        message, name = yield
         timestamp = time.monotonic()
         if last_timestamp is not None:
             packet_diff = timestamp - last_timestamp
@@ -77,6 +77,7 @@ def message_processor(client, visualise_callback):
             )
         )
         b = osc_message_builder.OscMessageBuilder("/filter")
+        b.add_arg(name)
         b.add_arg(pressure)
         b.add_arg(g_x)
         b.add_arg(g_y)
@@ -106,8 +107,8 @@ class NewJoyProtocol(DatagramProtocol):
 
 
     def datagram_received(self, data, addr):
-        print(self._resolve_name(addr[0]))
-        self._server._message_processor.send(data)
+        name = self._resolve_name(addr[0])
+        self._server._message_processor.send((data, name))
 
 
     def _resolve_name(self, ip):
