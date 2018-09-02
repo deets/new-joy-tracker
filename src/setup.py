@@ -11,8 +11,12 @@ from protocol import Protocol
 
 # SCL = 12
 # SDA = 14
-SCL = 27
-SDA = 26
+# SCL = 27
+# SDA = 26
+#SCL = 16
+#SDA = 17
+SCL = 0
+SDA = 4
 
 PORT = 5000
 CONNECT_TIMEOUT = 100
@@ -25,9 +29,9 @@ KNOWN_NETWORKS = {
     b'Schauspielhaus': (b'SH47hK8PwxZ', '192.168.30.34'),
 }
 
-def setup_i2c():
-    scl = machine.Pin(SCL, machine.Pin.OUT)
-    sda = machine.Pin(SDA, machine.Pin.OUT)
+def setup_i2c(scl=SCL, sda=SDA):
+    scl = machine.Pin(scl, machine.Pin.OUT)
+    sda = machine.Pin(sda, machine.Pin.OUT)
     i2c = machine.I2C(freq=400000, scl=scl, sda=sda)
     return i2c
 
