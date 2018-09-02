@@ -3,4 +3,4 @@
 
 from setup import main
 
-main("ANNA")
+main()

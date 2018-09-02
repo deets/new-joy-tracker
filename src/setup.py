@@ -24,7 +24,7 @@ RESET_COUNT = 10 # after these, we try to reset the board for reconnection
 LOOP_SLEEP_MS = 70
 
 KNOWN_NETWORKS = {
-    b'AtomExplosion': (b'66869443', '192.168.0.255'),
+    b'AtomExplosion': (b'66869443', '192.168.0.102'),
     b'TP-LINK_2.4GHz_BBADE9': (b'51790684', '192.168.2.104'),
     b'Schauspielhaus': (b'SH47hK8PwxZ', '192.168.30.34'),
 }
@@ -106,7 +106,7 @@ def main(name="BOB\0"):
         except Exception:
             pass
 
-    protocol = Protocol(name)
+    protocol = Protocol()
     reconnect_count = 0
     while True:
         print("connecting...")

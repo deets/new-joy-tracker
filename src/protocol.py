@@ -3,30 +3,22 @@
 import time
 import ustruct
 import array
+import machine
 
 class Protocol:
 
-    FORMAT = "<IHIIIfffhfff" # NAME, SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
+    FORMAT = "<HIIIfffhfff" # SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
                              # ACC_X, ACC_Y, ACC_Z, TEMP, GYR_X, GYR_Y, GYR_Z
 
-    def __init__(self, name):
-        """
-        name must be a four-character name that identifies
-        the device. Fill with \0 to pad, e.g
-
-        BOB\0
-        EVE\0
-        ANNA
-        DIEZ
-
-        """
-        assert len(name) == 4
-        self._name = ustruct.unpack("<I", ustruct.pack("ssss", *name))[0]
-        # startchar + datagram + checksum
-        self.buffer = bytearray(ustruct.calcsize(self.FORMAT) + 2)
+    def __init__(self):
+        name = machine.unique_id()
+        assert len(name) == 6
+        # startchar + datagram + checksum + name
+        self.buffer = bytearray(ustruct.calcsize(self.FORMAT) + 2 + 6)
+        for i, c in enumerate(name):
+            self.buffer[1 + i] = c # copy over name
         self._count = 0
         self.bmp_data = array.array("i", [0, 0, 0])
-
 
 
     def read_sensors(self, pressure_sensor, mpu):
@@ -41,8 +33,7 @@ class Protocol:
 
         ustruct.pack_into(
             self.FORMAT,
-            self.buffer, 1,
-            self._name,
+            self.buffer, 1 + 6, # start-byte plus name
             self._count,
             time.ticks_ms(),
             self.bmp_data[0],

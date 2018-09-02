@@ -2,20 +2,21 @@
 import struct
 import argparse
 import time
+import logging
 
 from functools import partial
 from socket import socket, SO_REUSEADDR, SOL_SOCKET, SOCK_DGRAM, AF_INET
 from asyncio import Task, coroutine, get_event_loop, DatagramProtocol
 
-import arpreq
-
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
+
+from .util import PackageParser
 
 DEFAULT_UDP_PORT = 5005
 DEFAULT_SERVER_PORT = 5000
 
-from .util import PackageParser
+logger = logging.getLogger(__name__)
 
 class Deriver():
 
@@ -44,7 +45,7 @@ class Asymptoter():
         return self._value
 
 
-FORMAT = "<cIHIIIfffhfffB" # START, NAME, SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
+FORMAT = "<c6cHIIIfffhfffB" # START, NAME[6], SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
                            # ACC_X, ACC_Y, ACC_Z, TEMP, GYR_X, GYR_Y, GYR_Z
                            # CHECKSUM
 
@@ -52,23 +53,26 @@ FORMAT = "<cIHIIIfffhfffB" # START, NAME, SEQUENCE, TIMESTAMP, TEMPERATURE, PRES
 def message_processor(client, visualise_callback):
     packet_length = struct.calcsize(FORMAT)
     parser = PackageParser(packet_length)
-    last_timestamp = None
+    last_timestamps = {}
 
     while True:
-        message, name = yield
+        message = yield
         timestamp = time.monotonic()
-        if last_timestamp is not None:
-            packet_diff = timestamp - last_timestamp
-        else:
-            packet_diff = 0
-        last_timestamp = timestamp
-
-        start, name, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z, checksum = \
+        start, n0, n1, n2, n3, n4, n5, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z, checksum = \
           struct.unpack(FORMAT, message)
 
         pressure /= 25600.0
+        name = b''.join((n0, n1, n2, n3, n4, n5))
 
-        print("{: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {} {: > 3.2f}".format(
+        if name not in last_timestamps:
+            last_timestamps[name] = timestamp
+            packet_diff = 0
+        else:
+            packet_diff = timestamp - last_timestamps[name]
+            last_timestamps[name] = timestamp
+
+        print("{} - {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {} {: > 3.2f}".format(
+            name,
             pressure,
             g_x, g_y, g_z,
             parser.invalid_count,
@@ -99,7 +103,6 @@ class NewJoyProtocol(DatagramProtocol):
         self._server = server
         self._transport = None
         self._ip2name_mapping = {}
-        self._unknown_gen = self._generate_unknown_names()
 
 
     def connection_made(self, transport):
@@ -107,28 +110,8 @@ class NewJoyProtocol(DatagramProtocol):
 
 
     def datagram_received(self, data, addr):
-        name = self._resolve_name(addr[0])
-        self._server._message_processor.send((data, name))
-
-
-    def _resolve_name(self, ip):
-        if ip not in self._ip2name_mapping:
-            mac = arpreq.arpreq(ip)
-            if mac is None:
-                mac = next(self._unknown_gen)
-            self._ip2name_mapping[ip] = mac
-        return self._ip2name_mapping[ip]
-
-
-    def _generate_unknown_names(self):
-        """
-        Generate dummy-names for
-        unresolvable mac-addresses
-        """
-        count = 1
-        while True:
-            yield f"unknown-{count}"
-            count += 1
+        logger.debug(data)
+        self._server._message_processor.send(data)
 
 
 class Server(object):
@@ -160,7 +143,12 @@ def main():
     parser.add_argument("destination", help="Destination UDP IP")
     parser.add_argument("--port", help="Destination UDP port", default=DEFAULT_UDP_PORT)
     parser.add_argument("-v", "--visualise", help="Send OSC to visualisation server, the format for this argument is ip:port")
+    parser.add_argument("-d", "--debug", action="store_true")
     opts = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.DEBUG if opts.debug else logging.INFO,
+    )
 
     client = udp_client.UDPClient(opts.destination, opts.port)
 

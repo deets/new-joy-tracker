@@ -6,8 +6,7 @@ import time
 
 from bokeh.models import ColumnDataSource
 from bokeh.plotting import curdoc, figure
-from bokeh.layouts import layout
-
+from bokeh.layouts import column
 
 from tornado import gen
 from pythonosc import osc_server
@@ -17,84 +16,77 @@ from surface3d import Surface3d
 
 ROLLOVER = 1000
 
-@gen.coroutine
-def update(source, **kw):
-    item = dict((k, [v]) for k, v in kw.items())
-    source.stream(item, rollover=ROLLOVER)
+
+class BoardInfo:
+    # the names of the columns
+    # per OSC packet. The name is special,
+    # it's of course not displayed in every update.
+    COLUMNS = ["name", "pressure", "gyro_x", "gyro_y", "gyro_z", "acc_x", "acc_y", "acc_z", "packet_diff"]
+
+    HEIGHT = 150
+
+    def __init__(self, name, layout):
+        self._layout = layout
+        self._name = name
+        self._setup = False
+
+        data = dict(
+            x=[datetime.now()],
+        )
+        for column in self.COLUMNS[1:]: # skip name
+            data[column] = [0]
+
+        self._source = ColumnDataSource(
+            data=data,
+        )
+
+    @gen.coroutine
+    def update(self, when, *args):
+        self._setup_figures()
+        data = { k: [v] for k, v in zip(self.COLUMNS[1:], args)}
+        data["x"] = [when]
+        self._source.stream(data)
+
+
+    def _setup_figures(self):
+        if self._setup:
+            return
+        self._setup = True
+
+        p = figure(x_axis_type='datetime', y_axis_label="packet_diff", height=self.HEIGHT)
+        p.circle(x='x', y="packet_diff", source=self._source)
+        self._layout.children.append(p)
 
 
 def schedule_update(
-        doc, source, path,
+        doc, clients, layout,
         # All following arguments are from the OSC package
+        path,
         name,
-        pressure,
-        gyro_x,
-        gyro_y,
-        gyro_z,
-        acc_x,
-        acc_y,
-        acc_z,
-        packet_diff,
+        *args
         ):
-    x = datetime.now()
-    # but update the document from callback
+    if name not in clients:
+        clients[name] = BoardInfo(name, layout)
+
+    # update the document from callback
     doc.add_next_tick_callback(
-        partial(
-            update,
-            source=source,
-            x=x,
-            pressure=pressure,
-            gyro_x=gyro_x,
-            gyro_y=gyro_y,
-            gyro_z=gyro_z,
-            acc_x=acc_x,
-            acc_y=acc_y,
-            acc_z=acc_z,
-            packet_diff=packet_diff,
-        )
+        partial(clients[name].update, datetime.now(), *args)
     )
 
-
-COLUMNS = ["pressure", "gyro_x", "gyro_y", "gyro_z", "acc_x", "acc_y", "acc_z", "packet_diff"]
-
-GLYPH_TYPES = {
-    "packet_diff": "circle",
-}
 
 def main():
     # this must only be modified from a Bokeh session callback
-    data = dict(
-            x=[datetime.now()],
-    )
-    for column in COLUMNS:
-        data[column] = [0]
-
-    source = ColumnDataSource(
-        data=data,
-    )
 
     # This is important! Save curdoc() to make sure all threads
     # see the same document.
     doc = curdoc()
-
-    plots = {}
-    for column in COLUMNS:
-        p = figure(x_axis_type='datetime', y_axis_label=column)
-        getattr(p, GLYPH_TYPES.get(column, "line"))(x='x', y=column, source=source)
-        plots[column] = p
-
     #thingy = Surface3d(x="gyro_x", y="gyro_y", z="gyro_z", data_source=source)
-    l = layout([
-        [plots["pressure"], plots["packet_diff"]],
-        [plots["gyro_x"], plots["gyro_y"], plots["gyro_z"]],
-        [plots["acc_x"], plots["acc_y"], plots["acc_z"]],
-        ],
-        sizing_mode='stretch_both'
-    )
-    doc.add_root(l)
-
+    layout = column(children=[], sizing_mode='stretch_both')
+    doc.add_root(layout)
+    # mapping of name to ClientInfo
+    clients = {}
     disp = dispatcher.Dispatcher()
-    disp.map("/filter", partial(schedule_update, doc, source))
+    disp.map("/filter", partial(schedule_update, doc, clients, layout))
     server = osc_server.BlockingOSCUDPServer(("localhost", 10000), disp)
     server_thread = threading.Thread(target=server.serve_forever)
     server_thread.start()
