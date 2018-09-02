@@ -3,7 +3,7 @@
 import os
 import subprocess
 
-vis_py = os.path.join(os.path.dirname(__file__), "visualisation.py")
-assert os.path.exists(vis_py), vis_py
+vis_app = os.path.join(os.path.dirname(__file__), "visualisation")
+assert os.path.exists(vis_app), vis_app
 
-subprocess.run(["bokeh", "serve", "--show", vis_py])
+subprocess.run(["bokeh", "serve", "--show", vis_app])

@@ -13,6 +13,8 @@ from tornado import gen
 from pythonosc import osc_server
 from pythonosc import dispatcher
 
+from surface3d import Surface3d
+
 ROLLOVER = 1000
 
 @gen.coroutine
@@ -79,6 +81,7 @@ def main():
         getattr(p, GLYPH_TYPES.get(column, "line"))(x='x', y=column, source=source)
         plots[column] = p
 
+    #thingy = Surface3d(x="gyro_x", y="gyro_y", z="gyro_z", data_source=source)
     l = layout([
         [plots["pressure"], plots["packet_diff"]],
         [plots["gyro_x"], plots["gyro_y"], plots["gyro_z"]],
