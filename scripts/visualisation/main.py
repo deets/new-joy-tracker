@@ -23,35 +23,36 @@ class BoardInfo:
     # it's of course not displayed in every update.
     COLUMNS = ["name", "pressure", "gyro_x", "gyro_y", "gyro_z", "acc_x", "acc_y", "acc_z", "packet_diff"]
 
-    HEIGHT = 150
+    HEIGHT = 250
 
     def __init__(self, name, layout):
         self._layout = layout
         self._name = name
         self._setup = False
 
+    @gen.coroutine
+    def update(self, when, *args):
+        self._setup_figures(args)
+        data = { k: [v] for k, v in zip(self.COLUMNS[1:], args)}
+        data["x"] = [when]
+        self._source.stream(data, rollover=ROLLOVER)
+
+
+    def _setup_figures(self, args):
+        if self._setup:
+            return
+        self._setup = True
+
         data = dict(
             x=[datetime.now()],
         )
-        for column in self.COLUMNS[1:]: # skip name
-            data[column] = [0]
+        for column, value in zip(self.COLUMNS[1:], args): # skip name
+            data[column] = [value]
 
         self._source = ColumnDataSource(
             data=data,
         )
 
-    @gen.coroutine
-    def update(self, when, *args):
-        self._setup_figures()
-        data = { k: [v] for k, v in zip(self.COLUMNS[1:], args)}
-        data["x"] = [when]
-        self._source.stream(data)
-
-
-    def _setup_figures(self):
-        if self._setup:
-            return
-        self._setup = True
 
         p = figure(x_axis_type='datetime', y_axis_label="packet_diff", height=self.HEIGHT)
         p.circle(x='x', y="packet_diff", source=self._source)
