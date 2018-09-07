@@ -46,6 +46,7 @@ class BoardInfo:
         data = dict(
             x=[datetime.now()],
         )
+
         for column, value in zip(self.COLUMNS[1:], args): # skip name
             data[column] = [value]
 
@@ -54,7 +55,7 @@ class BoardInfo:
         )
 
 
-        p = figure(x_axis_type='datetime', y_axis_label="packet_diff", height=self.HEIGHT)
+        p = figure(x_axis_type='datetime', y_axis_label="{} packet_diff".format(self._name), height=self.HEIGHT)
         p.circle(x='x', y="packet_diff", source=self._source)
         self._layout.children.append(p)
 
