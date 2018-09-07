@@ -6,7 +6,7 @@ import socket
 import struct
 
 from bme280 import BME280, BME280_I2CADDR
-from mpu6050 import MPU
+from mpu6050 import MPU, MPU6050_DEFAULT_ADDRESS
 from protocol import Protocol
 
 # SCL = 12
@@ -46,7 +46,13 @@ def setup_bmp280(i2c):
 
 
 def setup_mpu(i2c):
-    return MPU(i2c)
+    try:
+        if MPU6050_DEFAULT_ADDRESS in i2c.scan():
+            return MPU(i2c)
+    except OSError:
+        # this can happen because of floating or pulled-up i2cs
+        pass
+    return None
 
 
 def ip2bits(ip):

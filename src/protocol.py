@@ -22,7 +22,10 @@ class Protocol:
 
 
     def read_sensors(self, pressure_sensor, mpu):
-        acc_x, acc_y, acc_z, temp, gyr_x, gyr_y, gyr_z = mpu.read_sensors_scaled()
+        if mpu is not None:
+            acc_x, acc_y, acc_z, temp, gyr_x, gyr_y, gyr_z = mpu.read_sensors_scaled()
+        else:
+            acc_x, acc_y, acc_z, temp, gyr_x, gyr_y, gyr_z = 0, 0, 0, 0, 0, 0, 0
 
         if pressure_sensor is not None:
             pressure_sensor.read_compensated_data(self.bmp_data)
