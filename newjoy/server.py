@@ -12,6 +12,8 @@ from pythonosc import osc_message_builder
 from pythonosc import udp_client
 
 from .util import PackageParser
+from .naming import resolve
+
 
 DEFAULT_UDP_PORT = 5005
 DEFAULT_SERVER_PORT = 5000
@@ -62,7 +64,8 @@ def message_processor(client, visualise_callback):
           struct.unpack(FORMAT, message)
 
         pressure /= 25600.0
-        name = b''.join((n0, n1, n2, n3, n4, n5))
+        id_ = b''.join((n0, n1, n2, n3, n4, n5))
+        name = resolve(id_)
 
         if name not in last_timestamps:
             last_timestamps[name] = timestamp
