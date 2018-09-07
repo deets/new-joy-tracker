@@ -70,11 +70,12 @@ def message_processor(client, visualise_callback):
         if name not in last_timestamps:
             last_timestamps[name] = timestamp
             packet_diff = 0
+            logger.info("%s joined the merry bunch of %02i", name, len(last_timestamps))
         else:
             packet_diff = timestamp - last_timestamps[name]
             last_timestamps[name] = timestamp
 
-        print("{} - {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {} {: > 3.2f}".format(
+        logger.debug("{} - {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {} {: > 3.2f}".format(
             name,
             pressure,
             g_x, g_y, g_z,
