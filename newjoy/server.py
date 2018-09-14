@@ -13,7 +13,7 @@ from pythonosc import udp_client
 
 from .util import PackageParser
 from .naming import resolve
-
+from .logger import Logger
 
 DEFAULT_UDP_PORT = 5005
 DEFAULT_SERVER_PORT = 5000
@@ -151,6 +151,7 @@ def main():
     parser.add_argument("--port", help="Destination UDP port", default=DEFAULT_UDP_PORT)
     parser.add_argument("-v", "--visualise", help="Send OSC to visualisation server, the format for this argument is ip:port")
     parser.add_argument("-d", "--debug", action="store_true")
+    parser.add_argument("-l", "--log")
     opts = parser.parse_args()
 
     logging.basicConfig(
@@ -164,6 +165,9 @@ def main():
 
     def visualise_callback(_):
         pass
+
+    if opts.log:
+        logging_callback = Logger(opts.log).logging_callback
 
     if opts.visualise is not None:
         ip, port = opts.visualise.split(":")
