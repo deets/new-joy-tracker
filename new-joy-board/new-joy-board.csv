@@ -1,0 +1,8 @@
+Reference, Quantity, Value, Footprint, Datasheet, Field4
+J0 J1 J2 J3 ,4,"SDS-50J","new-joy:CUI_SDS-50J","CUI Inc","Manufacturer recommendations"
+J4 ,1,"BAT","TerminalBlock:TerminalBlock_bornier-2_P5.08mm",""
+R1 R10 R11 R12 R13 R14 R15 R16 R2 R3 R4 R5 R6 R7 R8 R9 ,16,"4K7","Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder",""
+U10 ,1,"oskj-dc-dc","new-joy:oskj-dc-dc",""
+U0 U1 U2 U3 ,4,"P82B715","new-joy:P82B715D",""
+U4 ,1,"AZReady_ESP32","new-joy:AZReady_ESP32",""
+U7 ,1,"MPU6050_Breakout","new-joy:MPU6050_Breakout",""

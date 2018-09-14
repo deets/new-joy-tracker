@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>/home/deets/Dropbox/projects/new-joy-tracker/new-joy-board/new-joy-board.sch</source>
+    <date>Mo 10 Sep 2018 22:06:30 CEST</date>
+    <tool>Eeschema 5.0.0-fee4fd1~66~ubuntu18.04.1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>new-joy-board.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="J4">
+      <value>BAT</value>
+      <footprint>TerminalBlock:TerminalBlock_bornier-2_P5.08mm</footprint>
+      <libsource lib="new-joy-board-rescue" part="Screw_Terminal_01x02" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B23E0D2</tstamp>
+    </comp>
+    <comp ref="R1">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B2525BD</tstamp>
+    </comp>
+    <comp ref="R3">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B25261D</tstamp>
+    </comp>
+    <comp ref="U7">
+      <value>MPU6050_Breakout</value>
+      <footprint>new-joy:MPU6050_Breakout</footprint>
+      <libsource lib="new-joy" part="MPU6050_Breakout" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B25335B</tstamp>
+    </comp>
+    <comp ref="U3">
+      <value>P82B715</value>
+      <footprint>new-joy:P82B715D</footprint>
+      <libsource lib="new-joy" part="P82B715" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B2560BB</tstamp>
+    </comp>
+    <comp ref="R2">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B81197F</tstamp>
+    </comp>
+    <comp ref="R4">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B811985</tstamp>
+    </comp>
+    <comp ref="R5">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B81321C</tstamp>
+    </comp>
+    <comp ref="R7">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B813222</tstamp>
+    </comp>
+    <comp ref="R6">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B813238</tstamp>
+    </comp>
+    <comp ref="R8">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B81323E</tstamp>
+    </comp>
+    <comp ref="J0">
+      <value>SDS-50J</value>
+      <footprint>new-joy:CUI_SDS-50J</footprint>
+      <datasheet>CUI Inc</datasheet>
+      <fields>
+        <field name="Field4">Manufacturer recommendations</field>
+      </fields>
+      <libsource lib="new-joy" part="SDS-50J" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B803805</tstamp>
+    </comp>
+    <comp ref="J1">
+      <value>SDS-50J</value>
+      <footprint>new-joy:CUI_SDS-50J</footprint>
+      <datasheet>CUI Inc</datasheet>
+      <fields>
+        <field name="Field4">Manufacturer recommendations</field>
+      </fields>
+      <libsource lib="new-joy" part="SDS-50J" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B811FFF</tstamp>
+    </comp>
+    <comp ref="J2">
+      <value>SDS-50J</value>
+      <footprint>new-joy:CUI_SDS-50J</footprint>
+      <datasheet>CUI Inc</datasheet>
+      <fields>
+        <field name="Field4">Manufacturer recommendations</field>
+      </fields>
+      <libsource lib="new-joy" part="SDS-50J" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B812E87</tstamp>
+    </comp>
+    <comp ref="J3">
+      <value>SDS-50J</value>
+      <footprint>new-joy:CUI_SDS-50J</footprint>
+      <datasheet>CUI Inc</datasheet>
+      <fields>
+        <field name="Field4">Manufacturer recommendations</field>
+      </fields>
+      <libsource lib="new-joy" part="SDS-50J" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B812E8E</tstamp>
+    </comp>
+    <comp ref="R9">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B83BB52</tstamp>
+    </comp>
+    <comp ref="R11">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B83BB58</tstamp>
+    </comp>
+    <comp ref="R10">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B83BB6E</tstamp>
+    </comp>
+    <comp ref="R12">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B83BB74</tstamp>
+    </comp>
+    <comp ref="R13">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B83BB8A</tstamp>
+    </comp>
+    <comp ref="R15">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B83BB90</tstamp>
+    </comp>
+    <comp ref="R14">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B83BBA6</tstamp>
+    </comp>
+    <comp ref="R16">
+      <value>4K7</value>
+      <footprint>Resistor_SMD:R_1210_3225Metric_Pad1.42x2.65mm_HandSolder</footprint>
+      <libsource lib="new-joy-board-rescue" part="R" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B83BBAC</tstamp>
+    </comp>
+    <comp ref="U2">
+      <value>P82B715</value>
+      <footprint>new-joy:P82B715D</footprint>
+      <libsource lib="new-joy" part="P82B715" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B848287</tstamp>
+    </comp>
+    <comp ref="U1">
+      <value>P82B715</value>
+      <footprint>new-joy:P82B715D</footprint>
+      <libsource lib="new-joy" part="P82B715" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B849639</tstamp>
+    </comp>
+    <comp ref="U0">
+      <value>P82B715</value>
+      <footprint>new-joy:P82B715D</footprint>
+      <libsource lib="new-joy" part="P82B715" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B84AB8D</tstamp>
+    </comp>
+    <comp ref="U4">
+      <value>AZReady_ESP32</value>
+      <footprint>new-joy:AZReady_ESP32</footprint>
+      <libsource lib="new-joy" part="AZReady_ESP32" description="Generic connector, single row, 01x19"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B23C3C4</tstamp>
+    </comp>
+    <comp ref="U10">
+      <value>oskj-dc-dc</value>
+      <footprint>new-joy:oskj-dc-dc</footprint>
+      <libsource lib="new-joy" part="oskj-dc-dc" description=""/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B95549F</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="new-joy" part="AZReady_ESP32">
+      <description>Generic connector, single row, 01x19</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*_??x*mm*</fp>
+        <fp>Connector*:*1x??x*mm*</fp>
+        <fp>Pin?Header?Straight?1X*</fp>
+        <fp>Pin?Header?Angled?1X*</fp>
+        <fp>Socket?Strip?Straight?1X*</fp>
+        <fp>Socket?Strip?Angled?1X*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">AZReady_ESP32</field>
+        <field name="Footprint">new-joy:AZReady_ESP32</field>
+      </fields>
+      <pins>
+        <pin num="1" name="3V3" type="power_in"/>
+        <pin num="2" name="EN" type="passive"/>
+        <pin num="3" name="SP" type="passive"/>
+        <pin num="4" name="SM" type="passive"/>
+        <pin num="5" name="G34" type="BiDi"/>
+        <pin num="6" name="G35" type="BiDi"/>
+        <pin num="7" name="G32" type="BiDi"/>
+        <pin num="8" name="G23" type="BiDi"/>
+        <pin num="9" name="G25" type="BiDi"/>
+        <pin num="10" name="G26" type="BiDi"/>
+        <pin num="11" name="G27" type="BiDi"/>
+        <pin num="12" name="G14" type="BiDi"/>
+        <pin num="13" name="G12" type="BiDi"/>
+        <pin num="14" name="GND" type="power_in"/>
+        <pin num="15" name="G13" type="BiDi"/>
+        <pin num="16" name="SD2" type="BiDi"/>
+        <pin num="17" name="SD3" type="BiDi"/>
+        <pin num="18" name="CMD" type="passive"/>
+        <pin num="19" name="5V" type="power_in"/>
+        <pin num="20" name="CLK" type="output"/>
+        <pin num="21" name="SD0" type="BiDi"/>
+        <pin num="22" name="SD1" type="BiDi"/>
+        <pin num="23" name="G15" type="BiDi"/>
+        <pin num="24" name="G2" type="BiDi"/>
+        <pin num="25" name="G0" type="BiDi"/>
+        <pin num="26" name="G4" type="BiDi"/>
+        <pin num="27" name="G16" type="BiDi"/>
+        <pin num="28" name="G17" type="BiDi"/>
+        <pin num="29" name="G5" type="BiDi"/>
+        <pin num="30" name="G18" type="BiDi"/>
+        <pin num="31" name="G19" type="BiDi"/>
+        <pin num="32" name="GND" type="power_in"/>
+        <pin num="33" name="G21" type="BiDi"/>
+        <pin num="34" name="TXD" type="input"/>
+        <pin num="35" name="TXD" type="output"/>
+        <pin num="36" name="G22" type="BiDi"/>
+        <pin num="37" name="G23" type="BiDi"/>
+        <pin num="38" name="GND" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="new-joy" part="MPU6050_Breakout">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">MPU6050_Breakout</field>
+        <field name="Footprint">new-joy:MPU6050_Breakout</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VCC" type="power_in"/>
+        <pin num="2" name="GND" type="power_in"/>
+        <pin num="3" name="SCL" type="BiDi"/>
+        <pin num="4" name="SDA" type="BiDi"/>
+        <pin num="5" name="XCL" type="BiDi"/>
+        <pin num="6" name="XDA" type="BiDi"/>
+        <pin num="7" name="AD0" type="input"/>
+        <pin num="8" name="INT" type="output"/>
+      </pins>
+    </libpart>
+    <libpart lib="new-joy" part="P82B715">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">P82B715</field>
+        <field name="Footprint">new-joy:P82B715D</field>
+      </fields>
+      <pins>
+        <pin num="1" name="NC" type="NotConnected"/>
+        <pin num="2" name="Lx" type="BiDi"/>
+        <pin num="3" name="Sx" type="BiDi"/>
+        <pin num="4" name="GND" type="power_in"/>
+        <pin num="5" name="NC" type="NotConnected"/>
+        <pin num="6" name="Sy" type="BiDi"/>
+        <pin num="7" name="Ly" type="BiDi"/>
+        <pin num="8" name="VCC" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="new-joy" part="SDS-50J">
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">SDS-50J</field>
+        <field name="Footprint">CUI_SDS-50J</field>
+        <field name="Datasheet">CUI Inc</field>
+        <field name="Field4">Manufacturer recommendations</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+        <pin num="3" name="3" type="passive"/>
+        <pin num="4" name="4" type="passive"/>
+        <pin num="5" name="5" type="passive"/>
+        <pin num="S1" name="SHIELD" type="passive"/>
+        <pin num="S2" name="SHIELD" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="new-joy" part="oskj-dc-dc">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">oskj-dc-dc</field>
+        <field name="Footprint">new-joy:oskj-dc-dc</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VO+" type="power_out"/>
+        <pin num="2" name="GND" type="power_in"/>
+        <pin num="3" name="IN+" type="power_in"/>
+        <pin num="4" name="EN" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="new-joy-board-rescue" part="R">
+      <footprints>
+        <fp>R_*</fp>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="new-joy-board-rescue" part="Screw_Terminal_01x02">
+      <footprints>
+        <fp>Connector*Terminal*Block*:*</fp>
+        <fp>TerminalBlock*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Screw_Terminal_01x02</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="new-joy">
+      <uri>/home/deets/Dropbox/projects/new-joy-tracker/new-joy-board/new-joy.lib</uri>
+    </library>
+    <library logical="new-joy-board-rescue">
+      <uri>/home/deets/Dropbox/projects/new-joy-tracker/new-joy-board/new-joy-board-rescue.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="-BATT">
+      <node ref="U4" pin="38"/>
+      <node ref="U4" pin="32"/>
+      <node ref="U1" pin="4"/>
+      <node ref="U2" pin="4"/>
+      <node ref="U10" pin="2"/>
+      <node ref="J3" pin="1"/>
+      <node ref="J3" pin="S2"/>
+      <node ref="J3" pin="S1"/>
+      <node ref="J0" pin="1"/>
+      <node ref="J2" pin="S2"/>
+      <node ref="J2" pin="S1"/>
+      <node ref="J2" pin="1"/>
+      <node ref="J1" pin="S2"/>
+      <node ref="J1" pin="S1"/>
+      <node ref="U0" pin="4"/>
+      <node ref="U3" pin="4"/>
+      <node ref="U7" pin="2"/>
+      <node ref="J4" pin="2"/>
+      <node ref="J1" pin="1"/>
+      <node ref="J0" pin="S2"/>
+      <node ref="J0" pin="S1"/>
+    </net>
+    <net code="2" name="Net-(U0-Pad1)">
+      <node ref="U0" pin="1"/>
+    </net>
+    <net code="3" name="Net-(U0-Pad5)">
+      <node ref="U0" pin="5"/>
+    </net>
+    <net code="4" name="+5V">
+      <node ref="R9" pin="1"/>
+      <node ref="R11" pin="1"/>
+      <node ref="R10" pin="1"/>
+      <node ref="R12" pin="1"/>
+      <node ref="R16" pin="1"/>
+      <node ref="R14" pin="1"/>
+      <node ref="J0" pin="5"/>
+      <node ref="U4" pin="19"/>
+      <node ref="J1" pin="5"/>
+      <node ref="U2" pin="8"/>
+      <node ref="J2" pin="5"/>
+      <node ref="U0" pin="8"/>
+      <node ref="J3" pin="5"/>
+      <node ref="U3" pin="8"/>
+      <node ref="R15" pin="1"/>
+      <node ref="U1" pin="8"/>
+      <node ref="U10" pin="1"/>
+      <node ref="R13" pin="1"/>
+    </net>
+    <net code="5" name="/SCL0ESP">
+      <node ref="U7" pin="3"/>
+      <node ref="U4" pin="12"/>
+      <node ref="R7" pin="2"/>
+      <node ref="U0" pin="6"/>
+    </net>
+    <net code="6" name="/SDA0ESP">
+      <node ref="R8" pin="2"/>
+      <node ref="U7" pin="4"/>
+      <node ref="U4" pin="13"/>
+      <node ref="U0" pin="3"/>
+    </net>
+    <net code="7" name="/SDA0BUF">
+      <node ref="R16" pin="2"/>
+      <node ref="U0" pin="2"/>
+      <node ref="J0" pin="4"/>
+    </net>
+    <net code="8" name="Net-(U1-Pad1)">
+      <node ref="U1" pin="1"/>
+    </net>
+    <net code="9" name="Net-(U1-Pad5)">
+      <node ref="U1" pin="5"/>
+    </net>
+    <net code="10" name="Net-(U4-Pad17)">
+      <node ref="U4" pin="17"/>
+    </net>
+    <net code="11" name="Net-(U4-Pad16)">
+      <node ref="U4" pin="16"/>
+    </net>
+    <net code="12" name="Net-(U4-Pad15)">
+      <node ref="U4" pin="15"/>
+    </net>
+    <net code="13" name="Net-(U4-Pad14)">
+      <node ref="U4" pin="14"/>
+    </net>
+    <net code="14" name="Net-(U4-Pad29)">
+      <node ref="U4" pin="29"/>
+    </net>
+    <net code="15" name="/SCL3BUF">
+      <node ref="U3" pin="7"/>
+      <node ref="J3" pin="3"/>
+      <node ref="R9" pin="2"/>
+    </net>
+    <net code="16" name="/SDA3BUF">
+      <node ref="J3" pin="4"/>
+      <node ref="U3" pin="2"/>
+      <node ref="R10" pin="2"/>
+    </net>
+    <net code="17" name="/SCL2BUF">
+      <node ref="U2" pin="7"/>
+      <node ref="J2" pin="3"/>
+      <node ref="R11" pin="2"/>
+    </net>
+    <net code="18" name="/SCL1BUF">
+      <node ref="R13" pin="2"/>
+      <node ref="U1" pin="7"/>
+      <node ref="J1" pin="3"/>
+    </net>
+    <net code="19" name="/SDA1BUF">
+      <node ref="U1" pin="2"/>
+      <node ref="R14" pin="2"/>
+      <node ref="J1" pin="4"/>
+    </net>
+    <net code="20" name="/SCL0BUF">
+      <node ref="R15" pin="2"/>
+      <node ref="U0" pin="7"/>
+      <node ref="J0" pin="3"/>
+    </net>
+    <net code="21" name="Net-(U2-Pad1)">
+      <node ref="U2" pin="1"/>
+    </net>
+    <net code="22" name="/SDA2BUF">
+      <node ref="J2" pin="4"/>
+      <node ref="R12" pin="2"/>
+      <node ref="U2" pin="2"/>
+    </net>
+    <net code="23" name="/SCL1ESP">
+      <node ref="U4" pin="10"/>
+      <node ref="U1" pin="6"/>
+      <node ref="R5" pin="2"/>
+    </net>
+    <net code="24" name="/SDA1ESP">
+      <node ref="U4" pin="11"/>
+      <node ref="R6" pin="2"/>
+      <node ref="U1" pin="3"/>
+    </net>
+    <net code="25" name="Net-(U2-Pad5)">
+      <node ref="U2" pin="5"/>
+    </net>
+    <net code="26" name="Net-(U4-Pad18)">
+      <node ref="U4" pin="18"/>
+    </net>
+    <net code="27" name="/SCL2ESP">
+      <node ref="U2" pin="6"/>
+      <node ref="U4" pin="27"/>
+      <node ref="R3" pin="2"/>
+    </net>
+    <net code="28" name="/SDA2ESP">
+      <node ref="U4" pin="28"/>
+      <node ref="U2" pin="3"/>
+      <node ref="R4" pin="2"/>
+    </net>
+    <net code="29" name="Net-(U10-Pad4)">
+      <node ref="U10" pin="4"/>
+    </net>
+    <net code="30" name="+3V3">
+      <node ref="R2" pin="1"/>
+      <node ref="R8" pin="1"/>
+      <node ref="R6" pin="1"/>
+      <node ref="R5" pin="1"/>
+      <node ref="R7" pin="1"/>
+      <node ref="R3" pin="1"/>
+      <node ref="R1" pin="1"/>
+      <node ref="U4" pin="1"/>
+      <node ref="U7" pin="1"/>
+      <node ref="R4" pin="1"/>
+    </net>
+    <net code="31" name="Net-(U4-Pad4)">
+      <node ref="U4" pin="4"/>
+    </net>
+    <net code="32" name="Net-(U4-Pad37)">
+      <node ref="U4" pin="37"/>
+    </net>
+    <net code="33" name="Net-(U4-Pad36)">
+      <node ref="U4" pin="36"/>
+    </net>
+    <net code="34" name="Net-(U4-Pad35)">
+      <node ref="U4" pin="35"/>
+    </net>
+    <net code="35" name="Net-(U4-Pad34)">
+      <node ref="U4" pin="34"/>
+    </net>
+    <net code="36" name="Net-(U4-Pad33)">
+      <node ref="U4" pin="33"/>
+    </net>
+    <net code="37" name="Net-(U4-Pad31)">
+      <node ref="U4" pin="31"/>
+    </net>
+    <net code="38" name="Net-(U4-Pad30)">
+      <node ref="U4" pin="30"/>
+    </net>
+    <net code="39" name="Net-(U4-Pad3)">
+      <node ref="U4" pin="3"/>
+    </net>
+    <net code="40" name="Net-(U4-Pad5)">
+      <node ref="U4" pin="5"/>
+    </net>
+    <net code="41" name="/SCL3ESP">
+      <node ref="U3" pin="6"/>
+      <node ref="U4" pin="25"/>
+      <node ref="R1" pin="2"/>
+    </net>
+    <net code="42" name="Net-(U4-Pad24)">
+      <node ref="U4" pin="24"/>
+    </net>
+    <net code="43" name="Net-(U4-Pad23)">
+      <node ref="U4" pin="23"/>
+    </net>
+    <net code="44" name="Net-(U4-Pad22)">
+      <node ref="U4" pin="22"/>
+    </net>
+    <net code="45" name="Net-(U4-Pad21)">
+      <node ref="U4" pin="21"/>
+    </net>
+    <net code="46" name="Net-(U4-Pad20)">
+      <node ref="U4" pin="20"/>
+    </net>
+    <net code="47" name="Net-(U4-Pad2)">
+      <node ref="U4" pin="2"/>
+    </net>
+    <net code="48" name="+BATT">
+      <node ref="U10" pin="3"/>
+      <node ref="J4" pin="1"/>
+    </net>
+    <net code="49" name="Net-(U4-Pad9)">
+      <node ref="U4" pin="9"/>
+    </net>
+    <net code="50" name="Net-(U4-Pad8)">
+      <node ref="U4" pin="8"/>
+    </net>
+    <net code="51" name="Net-(U4-Pad7)">
+      <node ref="U4" pin="7"/>
+    </net>
+    <net code="52" name="Net-(U4-Pad6)">
+      <node ref="U4" pin="6"/>
+    </net>
+    <net code="53" name="/SDA3ESP">
+      <node ref="R2" pin="2"/>
+      <node ref="U4" pin="26"/>
+      <node ref="U3" pin="3"/>
+    </net>
+    <net code="54" name="Net-(U7-Pad6)">
+      <node ref="U7" pin="6"/>
+    </net>
+    <net code="55" name="Net-(U7-Pad5)">
+      <node ref="U7" pin="5"/>
+    </net>
+    <net code="56" name="Net-(U7-Pad7)">
+      <node ref="U7" pin="7"/>
+    </net>
+    <net code="57" name="Net-(U3-Pad1)">
+      <node ref="U3" pin="1"/>
+    </net>
+    <net code="58" name="Net-(U3-Pad5)">
+      <node ref="U3" pin="5"/>
+    </net>
+    <net code="59" name="Net-(U7-Pad8)">
+      <node ref="U7" pin="8"/>
+    </net>
+    <net code="60" name="Net-(J0-Pad2)">
+      <node ref="J0" pin="2"/>
+    </net>
+    <net code="61" name="Net-(J1-Pad2)">
+      <node ref="J1" pin="2"/>
+    </net>
+    <net code="62" name="Net-(J2-Pad2)">
+      <node ref="J2" pin="2"/>
+    </net>
+    <net code="63" name="Net-(J3-Pad2)">
+      <node ref="J3" pin="2"/>
+    </net>
+  </nets>
+</export>
