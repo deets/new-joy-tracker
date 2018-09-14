@@ -48,9 +48,9 @@ F 3 "" H 6700 3600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text Label 4600 4200 0    60   ~ 0
-SDA0ESP
+SCL1ESP
 Text Label 4600 4100 0    60   ~ 0
-SCL0ESP
+SDA1ESP
 $Comp
 L new-joy-board-rescue:R R1
 U 1 1 5B2525BD
@@ -111,9 +111,9 @@ F 3 "" H 8550 5350 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text Label 9250 5350 0    60   ~ 0
-SCL0ESP
+SCL3ESP
 Text Label 9250 5450 0    60   ~ 0
-SDA0ESP
+SDA3ESP
 $Comp
 L power:+3.3V #PWR013
 U 1 1 5B25365F
@@ -195,9 +195,9 @@ Wire Wire Line
 Wire Wire Line
 	5050 3900 4600 3900
 Text Label 4600 3900 0    50   ~ 0
-SCL1ESP
+SDA0ESP
 Text Label 4600 4000 0    50   ~ 0
-SDA1ESP
+SCL0ESP
 Wire Wire Line
 	6200 4100 6500 4100
 Wire Wire Line
@@ -207,13 +207,13 @@ Wire Wire Line
 Wire Wire Line
 	6200 4300 6500 4300
 Text Label 6500 4100 2    50   ~ 0
-SCL2ESP
-Text Label 6500 4000 2    50   ~ 0
-SDA2ESP
-Text Label 6500 4200 2    50   ~ 0
 SDA3ESP
-Text Label 6500 4300 2    50   ~ 0
+Text Label 6500 4000 2    50   ~ 0
 SCL3ESP
+Text Label 6500 4200 2    50   ~ 0
+SCL2ESP
+Text Label 6500 4300 2    50   ~ 0
+SDA2ESP
 $Comp
 L new-joy-board-rescue:R R2
 U 1 1 5B81197F
