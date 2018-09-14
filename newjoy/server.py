@@ -17,6 +17,7 @@ from .naming import resolve
 
 DEFAULT_UDP_PORT = 5005
 DEFAULT_SERVER_PORT = 5000
+OSC_PATH = "/filter"
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,7 @@ def message_processor(client, visualise_callback):
             packet_diff,
             )
         )
-        b = osc_message_builder.OscMessageBuilder("/filter")
+        b = osc_message_builder.OscMessageBuilder(OSC_PATH)
         b.add_arg(name)
         b.add_arg(pressure)
         b.add_arg(g_x)
