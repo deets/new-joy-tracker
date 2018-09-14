@@ -53,7 +53,7 @@ FORMAT = "<c6cHIIIfffhfffB" # START, NAME[6], SEQUENCE, TIMESTAMP, TEMPERATURE, 
                            # CHECKSUM
 
 
-def message_processor(client, visualise_callback):
+def message_processor(client, visualise_callback, logging_callback):
     packet_length = struct.calcsize(FORMAT)
     parser = PackageParser(packet_length)
     last_timestamps = {}
@@ -99,6 +99,7 @@ def message_processor(client, visualise_callback):
         message = b.build()
         client.send(message)
         visualise_callback(message)
+        logging_callback(message)
 
 
 class NewJoyProtocol(DatagramProtocol):
@@ -120,11 +121,12 @@ class NewJoyProtocol(DatagramProtocol):
 
 
 class Server(object):
-    def __init__(self, port, client, visualise_callback):
+    def __init__(self, port, client, visualise_callback, logging_callback):
         self._loop = get_event_loop()
         self._message_processor = message_processor(
             client,
-            visualise_callback
+            visualise_callback,
+            logging_callback,
         )
         # forward to send yield
         next(self._message_processor)
@@ -157,6 +159,9 @@ def main():
 
     client = udp_client.UDPClient(opts.destination, opts.port)
 
+    def logging_callback(*_):
+        pass
+
     def visualise_callback(_):
         pass
 
@@ -166,7 +171,7 @@ def main():
         def visualise_callback(message):
             vis_client.send(message)
 
-    server = Server(DEFAULT_SERVER_PORT, client, visualise_callback)
+    server = Server(DEFAULT_SERVER_PORT, client, visualise_callback, logging_callback)
     server.run_forever()
 
 if __name__ == '__main__':
