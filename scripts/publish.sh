@@ -49,7 +49,7 @@ def tag(path):
 def collect_files(src_dir, force=False, files=[]):
     def take_file(name):
         full_path = os.path.join(src_dir, name)
-        return name.endswith(".py") \
+        return os.path.splitext(name)[1] in (".py", ".txt") \
           and (force or changed(full_path)) \
           and (not files or name in files)
 

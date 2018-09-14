@@ -1,13 +1,13 @@
 import array
 import machine
 import time
-import network
 import socket
 import struct
 
 from bme280 import BME280, BME280_I2CADDR
 from mpu6050 import MPU, MPU6050_DEFAULT_ADDRESS
 from protocol import Protocol
+from wifi import setup_wifi
 
 # SCL = 12
 # SDA = 14
@@ -22,12 +22,6 @@ PORT = 5000
 CONNECT_TIMEOUT = 100
 RESET_COUNT = 10 # after these, we try to reset the board for reconnection
 LOOP_SLEEP_MS = 70
-
-KNOWN_NETWORKS = {
-    b'AtomExplosion': (b'66869443', '192.168.0.102'),
-    b'TP-LINK_2.4GHz_BBADE9': (b'51790684', '192.168.2.104'),
-    b'Schauspielhaus': (b'SH47hK8PwxZ', '192.168.30.34'),
-}
 
 def setup_i2c(scl=SCL, sda=SDA):
     scl = machine.Pin(scl, machine.Pin.OUT)
@@ -71,21 +65,6 @@ def bits2ip(bits):
     return ".".join(reversed(res))
 
 
-def setup_wifi():
-    nic = network.WLAN(network.STA_IF)
-    nic.active(True)
-    networks = nic.scan()
-    for name, *_ in networks:
-        if name in KNOWN_NETWORKS:
-            password, destination_address = KNOWN_NETWORKS[name]
-            nic.connect(name, password)
-            print("Connected to {}".format(name.decode("ascii")))
-            break
-    else:
-        raise Exception("Couldn't connect to WIFI network!")
-    return nic, destination_address
-
-
 def setup_socket(nic, destination_address):
     while not nic.isconnected():
         time.sleep(.1)
@@ -103,7 +82,7 @@ def setup_all():
     return pressure_sensor, mpu
 
 
-def main(name="BOB\0"):
+def main():
     pressure_sensor, mpu = setup_all()
     while True:
         try:
