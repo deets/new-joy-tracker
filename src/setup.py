@@ -65,13 +65,12 @@ def bits2ip(bits):
     return ".".join(reversed(res))
 
 
-def setup_socket(nic, destination_address):
+def setup_socket(nic):
     while not nic.isconnected():
         time.sleep(.1)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.connect((destination_address, PORT))
     return sock
 
 
@@ -96,10 +95,10 @@ def main():
     while True:
         print("connecting...")
         try:
-            s = setup_socket(nic, destination_address)
+            s = setup_socket(nic)
             while True:
                 protocol.read_sensors(pressure_sensor, mpu)
-                s.write(protocol.buffer)
+                s.sendto(protocol.buffer, (destination_address, PORT))
                 time.sleep_ms(LOOP_SLEEP_MS)
                 machine.idle()
         except OSError:
