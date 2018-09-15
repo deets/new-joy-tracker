@@ -512,12 +512,7 @@ NoConn ~ 5050 3400
 NoConn ~ 5050 3300
 NoConn ~ 5050 3200
 NoConn ~ 5050 3100
-NoConn ~ 6200 3100
-NoConn ~ 6200 3200
 NoConn ~ 6200 3400
-NoConn ~ 6200 3500
-NoConn ~ 6200 3700
-NoConn ~ 6200 3800
 NoConn ~ 6200 4400
 NoConn ~ 6200 4500
 NoConn ~ 6200 4600
@@ -772,7 +767,6 @@ F 3 "" H 1700 4450 50  0001 C CNN
 	1    1700 4450
 	1    0    0    -1  
 $EndComp
-NoConn ~ 6200 3900
 $Comp
 L new-joy:AZReady_ESP32 U4
 U 1 1 5B23C3C4
@@ -1293,4 +1287,85 @@ Wire Wire Line
 	2250 5200 2250 5350
 Wire Wire Line
 	2250 4250 2250 4450
+Text Label 6500 3100 2    50   ~ 0
+MOSI
+Text Label 6500 3800 2    50   ~ 0
+CLK
+Text Label 6500 3200 2    50   ~ 0
+MISO
+Text Label 6500 3900 2    50   ~ 0
+CS0
+$Comp
+L new-joy:24L01 U5
+U 1 1 5B9D26D1
+P 8450 3550
+F 0 "U5" H 8700 3600 50  0000 C CNN
+F 1 "24L01" H 8450 3600 50  0000 C CNN
+F 2 "new-joy:24L01" H 9100 4100 50  0001 C CNN
+F 3 "" H 8450 3550 50  0001 C CNN
+	1    8450 3550
+	1    0    0    -1  
+$EndComp
+Text Label 6500 3700 2    50   ~ 0
+CE
+Wire Wire Line
+	6200 3500 6500 3500
+Text Label 6500 3500 2    50   ~ 0
+IRQ
+Wire Wire Line
+	6200 3200 6500 3200
+Wire Wire Line
+	6200 3100 6500 3100
+Wire Wire Line
+	6200 3700 6500 3700
+Wire Wire Line
+	6200 3800 6500 3800
+Wire Wire Line
+	6200 3900 6500 3900
+Wire Wire Line
+	7850 3350 7600 3350
+Wire Wire Line
+	7850 3450 7600 3450
+Wire Wire Line
+	7600 3550 7850 3550
+Wire Wire Line
+	7850 3650 7600 3650
+Wire Wire Line
+	9050 3650 9300 3650
+Wire Wire Line
+	9050 3350 9300 3350
+Text Label 7600 3350 0    50   ~ 0
+CS0
+Text Label 7600 3450 0    50   ~ 0
+MOSI
+Text Label 7600 3550 0    50   ~ 0
+MISO
+Text Label 7600 3650 0    50   ~ 0
+CLK
+Text Label 9300 3350 2    50   ~ 0
+IRQ
+Text Label 9300 3650 2    50   ~ 0
+CE
+$Comp
+L power:GND #PWR016
+U 1 1 5B9EFC7D
+P 8450 3950
+F 0 "#PWR016" H 8450 3700 50  0001 C CNN
+F 1 "GND" H 8455 3777 50  0000 C CNN
+F 2 "" H 8450 3950 50  0001 C CNN
+F 3 "" H 8450 3950 50  0001 C CNN
+	1    8450 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR015
+U 1 1 5B9EFD23
+P 8450 3100
+F 0 "#PWR015" H 8450 2950 50  0001 C CNN
+F 1 "+3.3V" H 8465 3273 50  0000 C CNN
+F 2 "" H 8450 3100 50  0001 C CNN
+F 3 "" H 8450 3100 50  0001 C CNN
+	1    8450 3100
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

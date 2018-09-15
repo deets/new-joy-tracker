@@ -18,6 +18,13 @@ from wifi import setup_wifi
 SCL = 0
 SDA = 4
 
+CLK = 18 # SPI bus for 24L01
+MOSI = 23
+MISO = 22
+CS0 = 5
+CE = 19 # chip enable for 24L01
+IRQ = 21
+
 PORT = 5000
 CONNECT_TIMEOUT = 100
 RESET_COUNT = 10 # after these, we try to reset the board for reconnection
