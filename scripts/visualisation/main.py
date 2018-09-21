@@ -14,7 +14,7 @@ from pythonosc import dispatcher
 
 from surface3d import Surface3d
 
-ROLLOVER = 1000
+ROLLOVER = 100
 
 
 class BoardInfo:
