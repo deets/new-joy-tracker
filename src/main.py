@@ -3,4 +3,8 @@
 
 from setup import main
 
-main()
+try:
+    main()
+except KeyboardInterrupt:
+    import newjoy
+    newjoy.deinit()

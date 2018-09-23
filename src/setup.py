@@ -1,22 +1,22 @@
-import array
 import machine
 import time
 import socket
-import struct
+import newjoy
+import mpu6050
 
-from bme280 import BME280, BME280_I2CADDR
-from mpu6050 import MPU, MPU6050_DEFAULT_ADDRESS
+import array
+import ustruct
+
 from protocol import Protocol
 from wifi import setup_wifi
 
-# SCL = 12
-# SDA = 14
-# SCL = 27
-# SDA = 26
-#SCL = 16
-#SDA = 17
-SCL = 0
-SDA = 4
+I2C_BUSSES = [
+    # SCL, SDA
+    #(12, 14),
+    #(27, 26),
+    #(16, 17),
+    (0, 4)
+]
 
 CLK = 18 # SPI bus for 24L01
 MOSI = 23
@@ -29,47 +29,15 @@ PORT = 5000
 CONNECT_TIMEOUT = 100
 RESET_COUNT = 10 # after these, we try to reset the board for reconnection
 LOOP_SLEEP_MS = 70
-
-def setup_i2c(scl=SCL, sda=SDA):
-    scl = machine.Pin(scl, machine.Pin.OUT)
-    sda = machine.Pin(sda, machine.Pin.OUT)
-    i2c = machine.I2C(freq=400000, scl=scl, sda=sda)
-    return i2c
+SENSOR_PERIOD = 2 # in milliseconds
+I2C_FREQUENCY = 1000_000
 
 
-def setup_bmp280(i2c):
-    if BME280_I2CADDR in i2c.scan():
-        pressure_sensor = BME280(i2c=i2c)
-    else:
-        pressure_sensor = None
-        print('no pressure sensor detected')
-    return pressure_sensor
-
-
-def setup_mpu(i2c):
-    try:
-        if MPU6050_DEFAULT_ADDRESS in i2c.scan():
-            return MPU(i2c)
-    except OSError:
-        # this can happen because of floating or pulled-up i2cs
-        pass
-    return None
-
-
-def ip2bits(ip):
-    res = 0
-    for part in ip.split("."):
-        res <<= 8
-        res |= int(part)
-    return res
-
-
-def bits2ip(bits):
-    res = []
-    for i in range(4):
-        res.append(str(bits & 0xff))
-        bits >>= 8
-    return ".".join(reversed(res))
+def setup_i2c_busses():
+    for scl, sda in I2C_BUSSES:
+        scl = machine.Pin(scl, machine.Pin.OUT)
+        sda = machine.Pin(sda, machine.Pin.OUT)
+        yield machine.I2C(freq=I2C_FREQUENCY, scl=scl, sda=sda)
 
 
 def setup_socket(nic):
@@ -82,14 +50,19 @@ def setup_socket(nic):
 
 
 def setup_all():
-    i2c = setup_i2c()
-    pressure_sensor = setup_bmp280(i2c)
-    mpu = setup_mpu(i2c)
-    return pressure_sensor, mpu
+    protocol = Protocol()
+    for i2c in setup_i2c_busses():
+        print("scanning bus", i2c)
+        if mpu6050.present_on_bus(i2c):
+            print("found mpu, registering with protocol")
+            mpu6050.register_on_protocol(i2c, protocol)
+
+    protocol.assemble(SENSOR_PERIOD)
+    return protocol
 
 
 def main():
-    pressure_sensor, mpu = setup_all()
+    protocol = setup_all()
     while True:
         try:
             nic, destination_address = setup_wifi()
@@ -97,14 +70,14 @@ def main():
         except Exception:
             pass
 
-    protocol = Protocol()
     reconnect_count = 0
     while True:
         print("connecting...")
         try:
             s = setup_socket(nic)
             while True:
-                protocol.read_sensors(pressure_sensor, mpu)
+                protocol.update()
+                print(ustruct.unpack_from("ffff", protocol.buffer, 12))
                 s.sendto(protocol.buffer, (destination_address, PORT))
                 time.sleep_ms(LOOP_SLEEP_MS)
                 machine.idle()

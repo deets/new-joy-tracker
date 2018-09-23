@@ -7,6 +7,7 @@ import logging
 from functools import partial
 from socket import socket, SO_REUSEADDR, SOL_SOCKET, SOCK_DGRAM, AF_INET
 from asyncio import Task, coroutine, get_event_loop, DatagramProtocol
+from math import atan2, asin
 
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
@@ -48,58 +49,62 @@ class Asymptoter():
         return self._value
 
 
-FORMAT = "<c6cHIIIfffhfffB" # START, NAME[6], SEQUENCE, TIMESTAMP, TEMPERATURE, PRESSURE,
-                           # ACC_X, ACC_Y, ACC_Z, TEMP, GYR_X, GYR_Y, GYR_Z
-                           # CHECKSUM
+def compute_angles(q0, q1, q2, q3):
+  roll = atan2(q0*q1 + q2*q3, 0.5 - q1*q1 - q2*q2) *  57.29578
+  pitch = asin(-2.0 * (q1*q3 - q0*q2)) * 57.29578
+  yaw = atan2(q1*q2 + q0*q3, 0.5 - q2*q2 - q3*q3) * 57.29578 + 180.0
+  return roll, pitch, yaw
 
 
 def message_processor(client, visualise_callback, logging_callback):
-    packet_length = struct.calcsize(FORMAT)
-    parser = PackageParser(packet_length)
+    parser = PackageParser(resolve)
     last_timestamps = {}
 
     while True:
         message = yield
-        timestamp = time.monotonic()
-        start, n0, n1, n2, n3, n4, n5, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z, checksum = \
-          struct.unpack(FORMAT, message)
+        data = parser.feed(message)
+        #print(data)
+        print(compute_angles(*data))
+        # timestamp = time.monotonic()
+        # start, n0, n1, n2, n3, n4, n5, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z, checksum = \
+        #   struct.unpack(FORMAT, message)
 
-        pressure /= 25600.0
-        id_ = b''.join((n0, n1, n2, n3, n4, n5))
-        name = resolve(id_)
+        # pressure /= 25600.0
+        # id_ = b''.join((n0, n1, n2, n3, n4, n5))
+        # name = resolve(id_)
 
-        if name not in last_timestamps:
-            last_timestamps[name] = timestamp
-            packet_diff = 0
-            logger.info("%s joined the merry bunch of %02i", name, len(last_timestamps))
-        else:
-            packet_diff = timestamp - last_timestamps[name]
-            last_timestamps[name] = timestamp
+        # if name not in last_timestamps:
+        #     last_timestamps[name] = timestamp
+        #     packet_diff = 0
+        #     logger.info("%s joined the merry bunch of %02i", name, len(last_timestamps))
+        # else:
+        #     packet_diff = timestamp - last_timestamps[name]
+        #     last_timestamps[name] = timestamp
 
-        logger.debug("{} - {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {} {: > 3.2f}".format(
-            name,
-            pressure,
-            g_x, g_y, g_z,
-            parser.invalid_count,
-            seq,
-            packet_diff,
-            )
-        )
-        b = osc_message_builder.OscMessageBuilder(OSC_PATH)
-        b.add_arg(name)
-        b.add_arg(pressure)
-        b.add_arg(g_x)
-        b.add_arg(g_y)
-        b.add_arg(g_z)
-        b.add_arg(acc_x)
-        b.add_arg(acc_y)
-        b.add_arg(acc_z)
-        b.add_arg(packet_diff)
+        # logger.debug("{} - {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {} {: > 3.2f}".format(
+        #     name,
+        #     pressure,
+        #     g_x, g_y, g_z,
+        #     parser.invalid_count,
+        #     seq,
+        #     packet_diff,
+        #     )
+        # )
+        # b = osc_message_builder.OscMessageBuilder(OSC_PATH)
+        # b.add_arg(name)
+        # b.add_arg(pressure)
+        # b.add_arg(g_x)
+        # b.add_arg(g_y)
+        # b.add_arg(g_z)
+        # b.add_arg(acc_x)
+        # b.add_arg(acc_y)
+        # b.add_arg(acc_z)
+        # b.add_arg(packet_diff)
 
-        message = b.build()
-        client.send(message)
-        visualise_callback(message)
-        logging_callback(message)
+        # message = b.build()
+        # client.send(message)
+        # visualise_callback(message)
+        # logging_callback(message)
 
 
 class NewJoyProtocol(DatagramProtocol):
