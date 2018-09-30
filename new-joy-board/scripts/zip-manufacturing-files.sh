@@ -14,6 +14,7 @@ def main():
         for g in GLOBS:
             for name in glob.glob(g):
                 outf.write(name)
+                print(name)
 
 
 if __name__ == '__main__':
