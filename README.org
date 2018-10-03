@@ -2,6 +2,66 @@
 
 This is documentation for the sensor board I'm developing.
 
+** Running the system 
+
+*All following instructions assume that you are within the
+=new-joy-tracker= directory!*
+
+There is three components to running the boards:
+
+ - the boards themselves, which are based on micropython and whose
+   code is located under =src=.
+ - the OSC forwarding server. This is the sink for the data packets
+   sent by the boards. It produces OSC messages with a destination
+   given as commandline argument. 
+ - the visualisation system. This is just to gather insights into the
+   workings of the system. As of this writing, it just shows the
+   network latency by plotting the difference between the last two
+   packets that arrived.
+
+*** Requirements
+
+ - Python 3.7.
+ - [[https://pipenv.readthedocs.io/en/latest/][pipenv]] to manage the 3rd-party python packages.
+
+*** Start working
+
+To run the server and visualisation, you need to activate the =pipenv=
+shell. Then it's advisable to introduce a few aliases that are helpful.
+
+This is done by
+
+#+begin_src bash
+$ pipenv shell
+$ . aliases
+#+end_src
+
+The aliases available are =p= to publish the sources from =src= to the
+attached board. =r= opens the REPL on the board. Press =C-c= to stop
+the running program and poke around in the Python shell.
+
+*** Publish current source
+
+To publish the current version of the source code, just invoke the =p=
+command. *ATTENTION*: to save time during development, the command
+will record which version of a file has been published! As this is a
+local operation only, you need to use =p --force= to either push all
+files, or use =p src/network.txt src/foobar.py= to force-publish a
+selection of files.
+
+*ATTENTION* Sometimes the publishing doesn't return. This is probably
+due to the board being busy with something. In this case, press the
+=RST= button and shortly after try again.
+
+**** TODO custom micropython distribution with newjoy C-module
+
+*** Run server and visualisation
+
+#+begin_src bash
+$ ./scripts/server.sh <destination> [-v localhost:10000]
+$ ./scripts/visualisation.sh
+#+end_src
+
 ** Sensor Cable Color Coding
 
 I use a 5-wire cable to support the external pressure sensors.
@@ -14,7 +74,7 @@ The following table lists the assignment of functions to color:
 | Black  | GND      |
 | Brown  | 5V       |
 | Grey   | 3.3V     |
-| Yellow | SDA      |
+| Yhellow | SDA      |
 | Blue   | SCL      |
 |--------+----------|
 
