@@ -11,12 +11,12 @@ from wifi import setup_wifi
 
 # SCL = 12
 # SDA = 14
-# SCL = 27
-# SDA = 26
+SCL = 27
+SDA = 26
 #SCL = 16
 #SDA = 17
-SCL = 0
-SDA = 4
+#SCL = 0
+#SDA = 4
 
 CLK = 18 # SPI bus for 24L01
 MOSI = 23
