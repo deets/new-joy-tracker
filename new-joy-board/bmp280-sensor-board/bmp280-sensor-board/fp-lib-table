@@ -1,3 +1,0 @@
-(fp_lib_table
-  (lib (name new-joy)(type KiCad)(uri $KIPRJMOD/../../new-joy.pretty)(options "")(descr ""))
-)
