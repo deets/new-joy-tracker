@@ -148,7 +148,7 @@ class Server(object):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("destination", help="Destination UDP IP")
-    parser.add_argument("--port", help="Destination UDP port", default=DEFAULT_UDP_PORT)
+    parser.add_argument("--port", help="Destination UDP port, default: {}".format(DEFAULT_UDP_PORT), default=DEFAULT_UDP_PORT)
     parser.add_argument("-v", "--visualise", help="Send OSC to visualisation server, the format for this argument is ip:port")
     parser.add_argument("-d", "--debug", action="store_true")
     parser.add_argument("-l", "--log")
