@@ -105,44 +105,18 @@ $EndComp
 $Comp
 L new-joy:MPU6050_Breakout U7
 U 1 1 5B25335B
-P 9100 5500
-F 0 "U7" H 9100 6050 60  0000 C CNN
-F 1 "MPU6050_Breakout" H 9100 5000 60  0000 C CNN
-F 2 "new-joy:MPU6050_Breakout" H 9050 6200 60  0001 C CNN
-F 3 "" H 8550 5350 60  0001 C CNN
-	1    9100 5500
+P 9750 4500
+F 0 "U7" H 9750 5050 60  0000 C CNN
+F 1 "MPU6050_Breakout" H 9750 4000 60  0000 C CNN
+F 2 "new-joy:MPU6050_Breakout" H 9700 5200 60  0001 C CNN
+F 3 "" H 9200 4350 60  0001 C CNN
+	1    9750 4500
 	1    0    0    -1  
 $EndComp
-Text Label 9250 5350 0    60   ~ 0
+Text Label 10200 4400 0    60   ~ 0
 SCL3ESP
-Text Label 9250 5450 0    60   ~ 0
+Text Label 10200 4500 0    60   ~ 0
 SDA3ESP
-$Comp
-L power:+3.3V #PWR013
-U 1 1 5B25365F
-P 9900 5150
-F 0 "#PWR013" H 9900 5000 50  0001 C CNN
-F 1 "+3.3V" H 9900 5290 50  0000 C CNN
-F 2 "" H 9900 5150 50  0001 C CNN
-F 3 "" H 9900 5150 50  0001 C CNN
-	1    9900 5150
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR014
-U 1 1 5B25368E
-P 9900 5250
-F 0 "#PWR014" H 9900 5000 50  0001 C CNN
-F 1 "GND" H 9900 5100 50  0000 C CNN
-F 2 "" H 9900 5250 50  0001 C CNN
-F 3 "" H 9900 5250 50  0001 C CNN
-	1    9900 5250
-	1    0    0    -1  
-$EndComp
-NoConn ~ 9250 5850
-NoConn ~ 9250 5750
-NoConn ~ 9250 5650
-NoConn ~ 9250 5550
 $Comp
 L new-joy:P82B715 U3
 U 1 1 5B2560BB
@@ -190,10 +164,6 @@ Wire Wire Line
 	3450 1300 3450 1500
 Wire Wire Line
 	3500 2300 3500 2500
-Wire Wire Line
-	9250 5250 9900 5250
-Wire Wire Line
-	9250 5150 9900 5150
 Wire Wire Line
 	5050 4000 4600 4000
 Wire Wire Line
@@ -685,10 +655,6 @@ F 3 "" H 3050 5650 50  0001 C CNN
 	1    3050 5650
 	1    0    0    -1  
 $EndComp
-Text Label 3050 5450 0    60   ~ 0
-SDA2ESP
-Text Label 3050 5550 0    60   ~ 0
-SCL2ESP
 NoConn ~ 2250 5650
 NoConn ~ 3050 5350
 Wire Wire Line
@@ -1188,10 +1154,6 @@ Wire Wire Line
 Wire Wire Line
 	3650 4250 2250 4250
 Connection ~ 3650 4450
-Text Label 3050 5500 0    60   ~ 0
-SDA1ESP
-Text Label 3050 5600 0    60   ~ 0
-SCL1ESP
 $Comp
 L power:+5V #PWR09
 U 1 1 5B99FD58
@@ -1397,4 +1359,34 @@ F 3 "" H 8450 3100 50  0001 C CNN
 	1    8450 3100
 	1    0    0    -1  
 $EndComp
+Text Label 3050 5450 0    50   ~ 0
+SDA2ESP
+Text Label 3050 5550 0    50   ~ 0
+SCL2ESP
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5BB6898F
+P 9750 4050
+F 0 "#PWR?" H 9750 3900 50  0001 C CNN
+F 1 "+3.3V" H 9765 4223 50  0000 C CNN
+F 2 "" H 9750 4050 50  0001 C CNN
+F 3 "" H 9750 4050 50  0001 C CNN
+	1    9750 4050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5BB68A27
+P 9750 4900
+F 0 "#PWR?" H 9750 4650 50  0001 C CNN
+F 1 "GND" H 9755 4727 50  0000 C CNN
+F 2 "" H 9750 4900 50  0001 C CNN
+F 3 "" H 9750 4900 50  0001 C CNN
+	1    9750 4900
+	1    0    0    -1  
+$EndComp
+NoConn ~ 9300 4600
+NoConn ~ 9300 4500
+NoConn ~ 9300 4400
+NoConn ~ 10200 4600
 $EndSCHEMATC
