@@ -13,9 +13,9 @@ from wifi import setup_wifi
 I2C_BUSSES = [
     # SCL, SDA
     #(12, 14),
-    #(27, 26),
-    #(16, 17),
-    (0, 4)
+    (27, 26),
+    (17, 16),
+    (4, 0)
 ]
 
 CLK = 18 # SPI bus for 24L01
