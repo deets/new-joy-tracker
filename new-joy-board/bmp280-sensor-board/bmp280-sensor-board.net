@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source /home/deets/Dropbox/projects/new-joy-tracker/new-joy-board/bmp280-sensor-board/bmp280-sensor-board.sch)
-    (date "Mi 03 Okt 2018 21:19:33 CEST")
+    (date "Sa 20 Okt 2018 18:25:05 CEST")
     (tool "Eeschema 5.0.0-fee4fd1~66~ubuntu18.04.1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -44,7 +44,7 @@
       (tstamp 5BAE3CDD))
     (comp (ref J1)
       (value Conn_01x05)
-      (footprint Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical)
+      (footprint new-joy:Buffered-I2C-Cable-Connector)
       (datasheet ~)
       (libsource (lib Connector_Generic) (part Conn_01x05) (description "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"))
       (sheetpath (names /) (tstamps /))
@@ -84,7 +84,7 @@
       (tstamp 5BB4EE93))
     (comp (ref J2)
       (value Conn_01x05)
-      (footprint Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical)
+      (footprint new-joy:Buffered-I2C-Cable-Connector)
       (datasheet ~)
       (libsource (lib Connector_Generic) (part Conn_01x05) (description "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"))
       (sheetpath (names /) (tstamps /))
