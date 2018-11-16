@@ -8,15 +8,15 @@ I use a 5-wire cable to support the external pressure sensors.
 
 The following table lists the assignment of functions to color:
 
-|--------+----------+---------|
-| Color  | Function | DIN Pin |
-|--------+----------+---------|
-| Black  | GND      |       1 |
-| Brown  | 5V       |       5 |
-| Grey   | 3.3V     |       X |
-| Yellow | SDA      |       4 |
-| Blue   | SCL      |       3 |
-|--------+----------+---------|
+|--------+----------+---------+--------------|
+| Color  | Function | DIN Pin | Sensor Board |
+|--------+----------+---------+--------------|
+| Black  | GND      |       1 |            1 |
+| Brown  | 5V       |       5 |            5 |
+| Grey   | 3.3V     |       X |            X |
+| Yellow | SDA      |       4 |            4 |
+| Blue   | SCL      |       3 |            3 |
+|--------+----------+---------+--------------|
 
 
 ** Price Calculation
