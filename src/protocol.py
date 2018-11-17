@@ -69,7 +69,8 @@ class Protocol:
         for i, (bus, address, task, task_size) in enumerate(self._tasks):
             offset = i // 2
             current = descriptor[offset]
-            current |= task << (4 * i % 2)
+            current |= task << (4 * (i % 2))
+            print(offset, current, (4 * (i % 2)))
             descriptor[offset] = current
             newjoy.add_task(bus, address, task, task_byte_offset)
             task_byte_offset += task_size

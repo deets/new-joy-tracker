@@ -6,11 +6,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 TASKS = {
-    1 : "MPU6050",
+    1: "MPU6050",
+    2: "BMP280",
 }
 
 TASK_CONFIG = {
-    "MPU6050": "ffff"
+    "MPU6050": "ffff",
+    "BMP280": "I",
 }
 
 
@@ -37,16 +39,15 @@ class PackageParser:
             return
 
         if len(data) != length:
-            logger.debug("malformed data, length field and lengt of data mismatch")
+            logger.debug("malformed data, length field and length of data mismatch")
         id_ = data[3:3 + 6]
         name = self._resolve(id_)
         if name not in self._parsers:
             self._parsers[name] = self._setup_parser(data, name)
-        return self._parsers[name](data)
-
+        return name, self._parsers[name](data)
 
     def _setup_parser(self, data, name):
-        start = 1 + 2 + 6
+        start = 1 + 2 + 6  # start marker (#), length, esp32 id
         task_num = data[start]
         descriptor_length = task_num // 2 + task_num % 2
         payload_start = start + 1 + descriptor_length

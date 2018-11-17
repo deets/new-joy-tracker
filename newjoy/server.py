@@ -62,34 +62,8 @@ def message_processor(client, visualise_callback, logging_callback):
 
     while True:
         message = yield
-        data = parser.feed(message)
-        #print(data)
-        print(compute_angles(*data))
-        # timestamp = time.monotonic()
-        # start, n0, n1, n2, n3, n4, n5, seq, timestamp, bmp_temp, pressure, acc_x, acc_y, acc_z, temp, g_x, g_y, g_z, checksum = \
-        #   struct.unpack(FORMAT, message)
-
-        # pressure /= 25600.0
-        # id_ = b''.join((n0, n1, n2, n3, n4, n5))
-        # name = resolve(id_)
-
-        # if name not in last_timestamps:
-        #     last_timestamps[name] = timestamp
-        #     packet_diff = 0
-        #     logger.info("%s joined the merry bunch of %02i", name, len(last_timestamps))
-        # else:
-        #     packet_diff = timestamp - last_timestamps[name]
-        #     last_timestamps[name] = timestamp
-
-        # logger.debug("{} - {: > 10.3f} {: > 10.3f} {: > 10.3f} {: > 10.3f} {} {} {: > 3.2f}".format(
-        #     name,
-        #     pressure,
-        #     g_x, g_y, g_z,
-        #     parser.invalid_count,
-        #     seq,
-        #     packet_diff,
-        #     )
-        # )
+        name, data = parser.feed(message)
+        print(name, data)
         # b = osc_message_builder.OscMessageBuilder(OSC_PATH)
         # b.add_arg(name)
         # b.add_arg(pressure)

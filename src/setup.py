@@ -78,12 +78,6 @@ def main():
     protocol = setup_all()
 
     while True:
-        protocol.update()
-        #newjoy.deinit()
-        print(ustruct.unpack_from("ffffI", protocol.buffer, 12))
-
-
-    while True:
         try:
             nic, destination_address = setup_wifi()
             break
@@ -97,7 +91,7 @@ def main():
             s = setup_socket(nic)
             while True:
                 protocol.update()
-                print(ustruct.unpack_from("ffff", protocol.buffer, 12))
+                #print(ustruct.unpack_from("ffffI", protocol.buffer, 12))
                 s.sendto(protocol.buffer, (destination_address, PORT))
                 time.sleep_ms(LOOP_SLEEP_MS)
                 machine.idle()
