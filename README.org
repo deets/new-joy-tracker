@@ -72,10 +72,7 @@ For our use-case with up to 4 devices connected, the calculation should be
 ** ESP32
 
 *** Physical
-| Pin | Function |
-|-----+----------|
-|  12 | SCL      |
-|  14 | SDA      |
+
 
 *** Useful links
 
