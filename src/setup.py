@@ -1,39 +1,36 @@
 import machine
 import time
 import socket
-import newjoy
 import mpu6050
 
-import array
 import ustruct
 
-from protocol import Protocol
 from wifi import setup_wifi
 import bme280
 
 I2C_BUSSES = [
-    # SCL, SDA
-    #(12, 14),
     (27, 26),
     (17, 16),
     (4, 0)
 ]
 
-CLK = 18 # SPI bus for 24L01
+CLK = 18  # SPI bus for 24L01
 MOSI = 23
 MISO = 22
 CS0 = 5
-CE = 19 # chip enable for 24L01
+CE = 19  # chip enable for 24L01
 IRQ = 21
 
 PORT = 5000
 CONNECT_TIMEOUT = 100
-RESET_COUNT = 10 # after these, we try to reset the board for reconnection
+RESET_COUNT = 10  # after these, we try to reset the board for reconnection
 LOOP_SLEEP_MS = 70
-SENSOR_PERIOD = 2 # in milliseconds
+SENSOR_PERIOD = 2  # in milliseconds
 I2C_FREQUENCY = 1000_000
 
 BMP280S = []
+MPU6050S = []
+
 
 def setup_i2c_busses():
     for scl, sda in I2C_BUSSES:
@@ -52,13 +49,17 @@ def setup_socket(nic):
 
 
 def setup_all():
-    protocol = Protocol()
     for i2c in setup_i2c_busses():
         print("scanning bus", i2c)
-        if False and mpu6050.present_on_bus(i2c):
-            print("found mpu, registering with protocol")
-            mpu6050.register_on_protocol(i2c, protocol)
-        elif bme280.present_on_bus(i2c):
+        if mpu6050.present_on_bus(i2c):
+            MPU6050S.append(
+                mpu6050.MPU(
+                    i2c=i2c,
+                    address=mpu6050.present_on_bus(i2c)
+                )
+            )
+
+        if bme280.present_on_bus(i2c):
             BMP280S.append(
                 bme280.BME280(
                     i2c=i2c,
@@ -66,15 +67,20 @@ def setup_all():
                 )
             )
 
-    protocol.assemble(SENSOR_PERIOD)
-    return protocol
 
 
 def main():
-    protocol = setup_all()
     while True:
-        for bmp in BMP280S:
-            print(bmp.values)
+        try:
+            setup_all()
+            for _ in range(10):
+                for bmp in BMP280S:
+                    print(bmp.values)
+                for mpu in MPU6050S:
+                    print(mpu.read_sensors_scaled())
+                time.sleep(.2)
+        except OSError:
+            pass
 
     while True:
         try:
