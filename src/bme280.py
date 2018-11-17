@@ -204,3 +204,11 @@ class BME280:
         hd = h * 100 // 1024 - hi * 100
         return ("{}C".format(t / 100), "{}.{:02d}hPa".format(pi, pd),
                 "{}.{:02d}%".format(hi, hd))
+
+
+def present_on_bus(i2c):
+    addresses = i2c.scan()
+    if BME280_I2CADDR in addresses:
+        return BME280_I2CADDR
+    elif BME280_I2CADDR + 1 in addresses:
+        return BME280_I2CADDR + 1

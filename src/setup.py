@@ -9,6 +9,7 @@ import ustruct
 
 from protocol import Protocol
 from wifi import setup_wifi
+import bme280
 
 I2C_BUSSES = [
     # SCL, SDA
@@ -32,6 +33,7 @@ LOOP_SLEEP_MS = 70
 SENSOR_PERIOD = 2 # in milliseconds
 I2C_FREQUENCY = 1000_000
 
+BMP280S = []
 
 def setup_i2c_busses():
     for scl, sda in I2C_BUSSES:
@@ -56,6 +58,13 @@ def setup_all():
         if mpu6050.present_on_bus(i2c):
             print("found mpu, registering with protocol")
             mpu6050.register_on_protocol(i2c, protocol)
+        elif bme280.present_on_bus(i2c):
+            BMP280S.append(
+                bme280.BME280(
+                    i2c=i2c,
+                    address=bme280.present_on_bus(i2c)
+                )
+            )
 
     protocol.assemble(SENSOR_PERIOD)
     return protocol
@@ -63,6 +72,10 @@ def setup_all():
 
 def main():
     protocol = setup_all()
+    while True:
+        for bmp in BMP280S:
+            print(bmp.values)
+
     while True:
         try:
             nic, destination_address = setup_wifi()
@@ -76,7 +89,10 @@ def main():
         try:
             s = setup_socket(nic)
             while True:
-                protocol.update()
+                #protocol.update()
+                for bmp in BMP280S:
+                    print(bmp.values)
+
                 print(ustruct.unpack_from("ffff", protocol.buffer, 12))
                 s.sendto(protocol.buffer, (destination_address, PORT))
                 time.sleep_ms(LOOP_SLEEP_MS)
