@@ -55,7 +55,7 @@ def setup_all():
     protocol = Protocol()
     for i2c in setup_i2c_busses():
         print("scanning bus", i2c)
-        if mpu6050.present_on_bus(i2c):
+        if False and mpu6050.present_on_bus(i2c):
             print("found mpu, registering with protocol")
             mpu6050.register_on_protocol(i2c, protocol)
         elif bme280.present_on_bus(i2c):
