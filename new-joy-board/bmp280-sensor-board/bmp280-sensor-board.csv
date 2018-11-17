@@ -1,0 +1,8 @@
+Reference, Quantity, Value, Footprint, Datasheet
+C1 C2 ,2,"47uF","Capacitor_SMD:CP_Elec_5x5.8","~"
+C3 ,1,"0.1uF","Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder","~"
+J1 J2 ,2,"Conn_01x05","new-joy:Buffered-I2C-Cable-Connector","~"
+R1 R2 ,2,"2K2","Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder","~"
+U1 ,1,"TPS76933","Package_TO_SOT_SMD:SOT-23-5","http://www.ti.com/lit/ds/symlink/tps769.pdf"
+U3 ,1,"P82B715","new-joy:P82B715D",""
+U2 U4 ,2,"generic-i2c-device","new-joy:generic-i2c-device",""
