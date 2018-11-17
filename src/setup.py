@@ -1,35 +1,37 @@
+# -*- coding: utf-8 -*-
+# Copyright: 2018, Diez B. Roggisch, Berlin . All rights reserved.
+
 import machine
 import time
 import socket
 import newjoy
 import mpu6050
+import bme280
 
-import array
 import ustruct
 
 from protocol import Protocol
 from wifi import setup_wifi
 
 I2C_BUSSES = [
-    # SCL, SDA
-    #(12, 14),
+    #define SCL, SDA
     (27, 26),
     (17, 16),
     (4, 0)
 ]
 
-CLK = 18 # SPI bus for 24L01
+CLK = 18  # SPI bus for 24L01
 MOSI = 23
 MISO = 22
 CS0 = 5
-CE = 19 # chip enable for 24L01
+CE = 19  # chip enable for 24L01
 IRQ = 21
 
 PORT = 5000
 CONNECT_TIMEOUT = 100
-RESET_COUNT = 10 # after these, we try to reset the board for reconnection
+RESET_COUNT = 10  # after these, we try to reset the board for reconnection
 LOOP_SLEEP_MS = 70
-SENSOR_PERIOD = 2 # in milliseconds
+SENSOR_PERIOD = 2  # in milliseconds
 I2C_FREQUENCY = 1000_000
 
 
@@ -51,11 +53,22 @@ def setup_socket(nic):
 
 def setup_all():
     protocol = Protocol()
-    for i2c in setup_i2c_busses():
+    for busno, i2c in enumerate(setup_i2c_busses()):
         print("scanning bus", i2c)
-        if mpu6050.present_on_bus(i2c):
-            print("found mpu, registering with protocol")
-            mpu6050.register_on_protocol(i2c, protocol)
+        for address in mpu6050.present_on_bus(i2c):
+            print("found mpu @{}:{}, registering with protocol".format(
+                busno,
+                address,
+                )
+            )
+            mpu6050.register_on_protocol(i2c, address, protocol)
+        for address in bme280.present_on_bus(i2c):
+            print("found bmp280 @{}:{}, registering with protocol".format(
+                busno,
+                address,
+                )
+            )
+            bme280.register_on_protocol(i2c, address, protocol)
 
     protocol.assemble(SENSOR_PERIOD)
     return protocol
@@ -63,6 +76,13 @@ def setup_all():
 
 def main():
     protocol = setup_all()
+
+    while True:
+        protocol.update()
+        #newjoy.deinit()
+        print(ustruct.unpack_from("ffffI", protocol.buffer, 12))
+
+
     while True:
         try:
             nic, destination_address = setup_wifi()
