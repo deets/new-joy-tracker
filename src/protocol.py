@@ -6,12 +6,23 @@ import array
 import newjoy
 import machine
 
+
 class Protocol:
+
+    TASK_SPEC = {
+        newjoy.TASK_MPU6050: "fffffff",
+        newjoy.TASK_BMP280: "I",
+    }
 
     def __init__(self):
         self._tasks = []
         self.buffer = None
         self.payload = None
+        self._osc_spec = ""
+        self._osc_payload_start = -1
+        self._osc_path = "/" + "".join(
+            [hex(c)[2:] for c in machine.unique_id()]
+        )
 
     def register_task(self, bus, address, task, buffer_size):
         self._tasks.append((bus, address, task, buffer_size))
@@ -65,8 +76,10 @@ class Protocol:
             descriptor_start:descriptor_start+descriptor_length
         ]
         newjoy.init(sensor_period, self.buffer)
-        task_byte_offset = payload_start
+        self._osc_payload_start = task_byte_offset = payload_start
+
         for i, (bus, address, task, task_size) in enumerate(self._tasks):
+            self._osc_spec += self.TASK_SPEC[task]
             offset = i // 2
             current = descriptor[offset]
             current |= task << (4 * (i % 2))
@@ -77,3 +90,11 @@ class Protocol:
 
     def update(self):
         newjoy.sync()
+
+    def send_osc(self, osc):
+        args = ustruct.unpack_from(
+            self._osc_spec,
+            self.buffer,
+            self._osc_payload_start,
+        )
+        osc.send(self._osc_path, *args)

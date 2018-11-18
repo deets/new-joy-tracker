@@ -12,7 +12,14 @@ TAG_DIR = "/tmp"
 
 DEFAULT_SERIAL_PORT =  "/dev/tty.SLAB_USBtoUART" if platform.system() == 'Darwin' else "/dev/ttyUSB0"
 
+
 def hash_file(path):
+    if os.path.isdir(path):
+        return "".join(
+            (hash_file(os.path.join(path, name))
+             for name in os.listdir(path)),
+        )
+
     content_sum = hashlib.md5()
     with open(path, "rb") as inf:
         content_sum.update(inf.read())
@@ -49,14 +56,15 @@ def tag(path):
 def collect_files(src_dir, force=False, files=[]):
     def take_file(name):
         full_path = os.path.join(src_dir, name)
-        return os.path.splitext(name)[1] in (".py", ".txt") \
-          and (force or changed(full_path)) \
-          and (not files or name in files)
+        return (os.path.splitext(name)[1] in (".py", ".txt")
+                or os.path.basename(name) == "uosc") \
+                and (force or changed(full_path)) \
+                and (not files or name in files)
 
-    return [os.path.join(src_dir, name)
-                for name in os.listdir(src_dir)
-                if take_file(name)
-    ]
+    return [os.path.normpath(os.path.join(src_dir, name))
+            for name in os.listdir(src_dir)
+            if take_file(name)
+            ]
 
 
 def publish(path, port):

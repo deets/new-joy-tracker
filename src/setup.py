@@ -4,11 +4,10 @@
 import machine
 import time
 import socket
-import newjoy
 import mpu6050
 import bme280
+from uosc.client import Client
 
-import ustruct
 
 from protocol import Protocol
 from wifi import setup_wifi
@@ -85,14 +84,17 @@ def main():
             pass
 
     reconnect_count = 0
+
+    osc = Client(destination_address, 10000)
+
     while True:
         print("connecting...")
         try:
             s = setup_socket(nic)
             while True:
                 protocol.update()
-                #print(ustruct.unpack_from("ffffI", protocol.buffer, 12))
                 s.sendto(protocol.buffer, (destination_address, PORT))
+                protocol.send_osc(osc)
                 time.sleep_ms(LOOP_SLEEP_MS)
                 machine.idle()
         except OSError:
