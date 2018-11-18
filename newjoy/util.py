@@ -11,7 +11,7 @@ TASKS = {
 }
 
 TASK_CONFIG = {
-    "MPU6050": "ffff",
+    "MPU6050": "fffffff",
     "BMP280": "I",
 }
 
