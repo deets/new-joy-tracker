@@ -48,6 +48,7 @@ CE = 19  # chip enable for 24L01
 IRQ = 21
 
 PORT = 5000
+OSC_PORT = 10000
 CONNECT_TIMEOUT = 100
 RESET_COUNT = 10  # after these, we try to reset the board for reconnection
 LOOP_SLEEP_MS = 70
@@ -106,7 +107,7 @@ def main():
 
     reconnect_count = 0
 
-    osc = Client(destination_address, 10000)
+    osc = Client(destination_address, OSC_PORT)
 
     while True:
         print("connecting...")
@@ -114,8 +115,8 @@ def main():
             s = setup_socket(nic)
             while True:
                 protocol.update()
-                s.sendto(protocol.buffer, (destination_address, PORT))
                 protocol.send_osc(osc)
+                s.sendto(protocol.buffer, (destination_address, PORT))
                 time.sleep_ms(LOOP_SLEEP_MS)
                 machine.idle()
         except OSError:
