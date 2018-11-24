@@ -14,6 +14,11 @@ class Protocol:
         newjoy.TASK_BMP280: "I",
     }
 
+    TASK_ID = {
+        newjoy.TASK_MPU6050: "i",
+        newjoy.TASK_BMP280: "p",
+    }
+
     def __init__(self):
         self._tasks = []
         self.buffer = None
@@ -23,9 +28,15 @@ class Protocol:
         self._osc_path = "/" + "".join(
             [hex(c)[2:] for c in machine.unique_id()]
         )
+        self._osc_descriptor = {
+            0: "",
+            1: "",
+            2: "",
+            3: "",
+        }
 
-    def register_task(self, bus, address, task, buffer_size):
-        self._tasks.append((bus, address, task, buffer_size))
+    def register_task(self, bus, address, task, buffer_size, busno):
+        self._tasks.append((bus, address, task, buffer_size, busno))
 
     def assemble(self, sensor_period):
         name = machine.unique_id()
@@ -49,7 +60,10 @@ class Protocol:
         descriptor_length = task_num // 2 + task_num % 2
         # it follows the payload, the size is the accumulated size of
         # all tasks' storage needs
-        payload_size = sum(buffer_size for _, _, _, buffer_size in self._tasks)
+        payload_size = sum(
+            buffer_size for _, _, _, buffer_size, _
+            in self._tasks
+        )
         # the final checksum is just all bytes so far summed up as uint8_t
         checksum_size = 1
         buffer_size = start_char + message_length + name_length + \
@@ -78,15 +92,21 @@ class Protocol:
         newjoy.init(sensor_period, self.buffer)
         self._osc_payload_start = task_byte_offset = payload_start
 
-        for i, (bus, address, task, task_size) in enumerate(self._tasks):
+        for i, (bus, address, task, task_size, busno) in enumerate(self._tasks):
             self._osc_spec += self.TASK_SPEC[task]
+            self._osc_descriptor[busno] += self.TASK_ID[task]
             offset = i // 2
             current = descriptor[offset]
             current |= task << (4 * (i % 2))
-            print(offset, current, (4 * (i % 2)))
             descriptor[offset] = current
             newjoy.add_task(bus, address, task, task_byte_offset)
             task_byte_offset += task_size
+
+        osc_descriptor = ""
+        for busno, devices in sorted(self._osc_descriptor.items()):
+            if devices:
+                osc_descriptor += "{}{}".format(busno, devices)
+        self._osc_descriptor = osc_descriptor
 
     def update(self):
         newjoy.sync()
@@ -97,4 +117,4 @@ class Protocol:
             self.buffer,
             self._osc_payload_start,
         )
-        osc.send(self._osc_path, *args)
+        osc.send(self._osc_path, *((self._osc_descriptor,) + args))

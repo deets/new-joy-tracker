@@ -19,10 +19,11 @@ def present_on_bus(i2c):
     return res
 
 
-def register_on_protocol(i2c, address, protocol):
+def register_on_protocol(i2c, address, protocol, busno):
     protocol.register_task(
         i2c,
         address,
         newjoy.TASK_MPU6050,
         newjoy.MPU6050_BUFFER_SIZE,
+        busno,
     )

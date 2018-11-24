@@ -12,11 +12,32 @@ from uosc.client import Client
 from protocol import Protocol
 from wifi import setup_wifi
 
+# I2C 1 is missing due to some
+# system setup issue when the lines
+# pulled up.
+#
+# Looking from the top of the PCB
+# with the ESP32 module pointing
+# towards you (USB port!),
+# this is the allocation of I2C busses:
+#
+#    +------------+
+#    |            |
+#    | [NC]  [ 2] |
+#    |            |
+#    | [ 0]  [ 3] |
+#    |            |
+#    | +---+      |
+#    | |   |      |
+#    | |   |      |
+#    | +USB+      |
+#    +------------+
+#
+# define busno, SCL, SDA
 I2C_BUSSES = [
-    #define SCL, SDA
-    (27, 26),
-    (17, 16),
-    (4, 0)
+   (0, (27, 26)),  # I2C 0 on PCB
+   (2, (4, 0)),    # I2C 2 on PCB
+   (3, (17, 16)),  # I2C 3 on PCB
 ]
 
 CLK = 18  # SPI bus for 24L01
@@ -35,10 +56,10 @@ I2C_FREQUENCY = 1000_000
 
 
 def setup_i2c_busses():
-    for scl, sda in I2C_BUSSES:
+    for busno, (scl, sda) in I2C_BUSSES:
         scl = machine.Pin(scl, machine.Pin.OUT)
         sda = machine.Pin(sda, machine.Pin.OUT)
-        yield machine.I2C(freq=I2C_FREQUENCY, scl=scl, sda=sda)
+        yield busno, machine.I2C(freq=I2C_FREQUENCY, scl=scl, sda=sda)
 
 
 def setup_socket(nic):
@@ -52,7 +73,7 @@ def setup_socket(nic):
 
 def setup_all():
     protocol = Protocol()
-    for busno, i2c in enumerate(setup_i2c_busses()):
+    for busno, i2c in setup_i2c_busses():
         print("scanning bus", i2c)
         for address in mpu6050.present_on_bus(i2c):
             print("found mpu @{}:{}, registering with protocol".format(
@@ -60,14 +81,14 @@ def setup_all():
                 address,
                 )
             )
-            mpu6050.register_on_protocol(i2c, address, protocol)
+            mpu6050.register_on_protocol(i2c, address, protocol, busno)
         for address in bme280.present_on_bus(i2c):
             print("found bmp280 @{}:{}, registering with protocol".format(
                 busno,
                 address,
                 )
             )
-            bme280.register_on_protocol(i2c, address, protocol)
+            bme280.register_on_protocol(i2c, address, protocol, busno)
 
     protocol.assemble(SENSOR_PERIOD)
     return protocol
