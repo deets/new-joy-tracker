@@ -112,11 +112,11 @@ def main():
     while True:
         print("connecting...")
         try:
-            s = setup_socket(nic)
+            # s = setup_socket(nic)
             while True:
                 protocol.update()
                 protocol.send_osc(osc)
-                s.sendto(protocol.buffer, (destination_address, PORT))
+                # s.sendto(protocol.buffer, (destination_address, PORT))
                 time.sleep_ms(LOOP_SLEEP_MS)
                 machine.idle()
         except OSError:
