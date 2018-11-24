@@ -27,6 +27,7 @@ def hash_file(path):
 
 
 def get_tag_path(path):
+    path = os.path.normpath(path)
     tag_sum = hashlib.md5()
     tag_sum.update(path.encode("utf-8"))
     return os.path.join(
