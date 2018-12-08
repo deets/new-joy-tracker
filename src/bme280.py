@@ -13,7 +13,6 @@ def present_on_bus(i2c):
     for address in (BME280_I2CADDR, BME280_I2CADDR + 1):
         if address in addresses:
             id_register = read_byte(i2c, address, BMP280_ID)
-            print(address, id_register)
             if id_register == ord(b'X'):
                 res.append(address)
     return res
