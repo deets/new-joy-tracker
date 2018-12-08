@@ -6,7 +6,7 @@ from misc import read_byte
 
 MPU6050_ADDRESS_AD0_LOW = 0x68
 MPU6050_RA_WHO_AM_I = 0x75
-
+MPU6050_EXPECTED_IDS = (MPU6050_ADDRESS_AD0_LOW, 0x72)
 
 def present_on_bus(i2c):
     res = []
@@ -14,7 +14,7 @@ def present_on_bus(i2c):
     for address in (MPU6050_ADDRESS_AD0_LOW, MPU6050_ADDRESS_AD0_LOW + 1):
         if address in addresses:
             id_register = read_byte(i2c, address, MPU6050_RA_WHO_AM_I)
-            if id_register == MPU6050_ADDRESS_AD0_LOW:
+            if id_register in MPU6050_EXPECTED_IDS:
                 res.append(address)
     return res
 
