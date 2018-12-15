@@ -15,6 +15,7 @@ nose = "*"
 pylint = "*"
 arpreq = "*"
 scipy = "*"
+esptool = "*"
 
 [requires]
 python_version = "3.6"

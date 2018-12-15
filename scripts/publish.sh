@@ -5,12 +5,10 @@ import sys
 import argparse
 import subprocess
 import hashlib
-import platform
+from common import DEFAULT_SERIAL_PORT
 
 SRC_DIR = os.path.join(os.path.dirname(__file__), "../src")
 TAG_DIR = "/tmp"
-
-DEFAULT_SERIAL_PORT =  "/dev/tty.SLAB_USBtoUART" if platform.system() == 'Darwin' else "/dev/ttyUSB0"
 
 
 def hash_file(path):
