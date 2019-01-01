@@ -55,7 +55,7 @@ NOP          = const(0xff)  # use to read STATUS register
 START_LISTENING_TIMEOUT_US = const(130)
 
 class NRF24L01:
-    def __init__(self, spi, cs, ce, channel=46, payload_size=16):
+    def __init__(self, spi, cs, ce, channel=46, payload_size=16, retries=4, retry_pause=3):
         assert payload_size <= 32
 
         self.buf = bytearray(1)
@@ -86,7 +86,7 @@ class NRF24L01:
 
         # auto retransmit delay: 750us
         # auto retransmit count: 4
-        self.reg_write(SETUP_RETR, (3 << 4) | 4)
+        self.reg_write(SETUP_RETR, (retry_pause << 4) | retries)
 
         # set rf power and speed
         self.set_power_speed(POWER_3, SPEED_250K)  # Best for point to point links

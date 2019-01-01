@@ -9,6 +9,7 @@ from nrf24l01 import (
     POWER_0,
     POWER_3,
     SPEED_2M,
+    SPEED_250K,
     )
 from names import get_pipe_id
 
@@ -20,6 +21,8 @@ PIN_CFG = {
     'ce': 19
 }
 CHANNEL = const(46)
+POWER = POWER_3
+SPEED = SPEED_250K
 # timeout until we don't wait for a
 # spoke's response in ms
 RECEIVE_TIMEOUT_MS = const(25)
@@ -45,7 +48,7 @@ def create_nrf():
         payload_size=4,
         channel=CHANNEL,
     )
-    nrf.set_power_speed(POWER_3, SPEED_2M)
+    nrf.set_power_speed(POWER, SPEED)
     return nrf
 
 
@@ -67,9 +70,11 @@ def send_and_receive(spoke, nrf):
 
 
 def hub(spokes):
+    N = 100
     failures = 0
     timeouts = 0
     max_elapsed = 0
+    avg_elapsed = 0.0
     nrf = create_nrf()
     # we transmit using our ID
     nrf.open_tx_pipe(get_pipe_id())
@@ -81,7 +86,10 @@ def hub(spokes):
                 elapsed = utime.ticks_diff(utime.ticks_us(), then)
                 max_elapsed = max(max_elapsed, elapsed)
                 if message is not None:
-                    print("MSG:", message, max_elapsed, elapsed)
+
+                    avg_elapsed -= avg_elapsed / N
+                    avg_elapsed += elapsed / N
+                    print("MSG:", message, max_elapsed, avg_elapsed)
                 else:
                     timeouts += 1
                     print("timeouts: ", timeouts)
