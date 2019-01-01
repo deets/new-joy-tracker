@@ -11,7 +11,8 @@ from uosc.client import Client
 
 from protocol import Protocol
 from wifi import setup_wifi
-from names import MAPPING
+from names import get_name
+from nrf24protocol import hub, spoke
 
 # I2C 1 is missing due to some
 # system setup issue when the lines
@@ -97,13 +98,13 @@ def setup_all():
 
 
 def main():
-    print(
-        MAPPING.get(
-            machine.unique_id(),
-            "I'M NOT REGISTERED YET!",
-        )
-    )
+    name = get_name()
+    print(name)
     protocol = setup_all()
+    if name == "OTTO":
+        hub(["IRIS"])
+    elif name == "IRIS":
+        spoke("OTTO")
 
     while True:
         try:

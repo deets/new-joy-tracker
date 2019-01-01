@@ -50,6 +50,10 @@ FLUSH_RX     = const(0xe2)  # flush RX FIFO
 NOP          = const(0xff)  # use to read STATUS register
 
 
+# This is according to the datasheet the time
+# it takes to switch to rx mode
+START_LISTENING_TIMEOUT_US = const(130)
+
 class NRF24L01:
     def __init__(self, spi, cs, ce, channel=46, payload_size=16):
         assert payload_size <= 32
@@ -80,9 +84,9 @@ class NRF24L01:
         # disable dynamic payloads
         self.reg_write(DYNPD, 0)
 
-        # auto retransmit delay: 1750us
-        # auto retransmit count: 8
-        self.reg_write(SETUP_RETR, (6 << 4) | 8)
+        # auto retransmit delay: 750us
+        # auto retransmit count: 4
+        self.reg_write(SETUP_RETR, (3 << 4) | 4)
 
         # set rf power and speed
         self.set_power_speed(POWER_3, SPEED_250K)  # Best for point to point links
@@ -191,7 +195,7 @@ class NRF24L01:
         self.flush_rx()
         self.flush_tx()
         self.ce(1)
-        utime.sleep_us(130)
+        utime.sleep_us(START_LISTENING_TIMEOUT_US)
 
     def stop_listening(self):
         self.ce(0)
