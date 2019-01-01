@@ -1,5 +1,7 @@
 #!/bin/bash
-if [ -e /dev/tty.SLAB_USBtoUART ]; then
+if [ $# == 1 ]; then
+    PORT=$1
+elif [ -e /dev/tty.SLAB_USBtoUART ]; then
     PORT=/dev/tty.SLAB_USBtoUART
 else
     PORT=/dev/ttyUSB0
