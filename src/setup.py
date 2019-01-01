@@ -11,6 +11,7 @@ from uosc.client import Client
 
 from protocol import Protocol
 from wifi import setup_wifi
+from names import MAPPING
 
 # I2C 1 is missing due to some
 # system setup issue when the lines
@@ -96,6 +97,12 @@ def setup_all():
 
 
 def main():
+    print(
+        MAPPING.get(
+            machine.unique_id(),
+            "I'M NOT REGISTERED YET!",
+        )
+    )
     protocol = setup_all()
 
     while True:

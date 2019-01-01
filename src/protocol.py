@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 # Copyright: 2018, Diez B. Roggisch, Berlin . All rights reserved.
-import time
 import ustruct
-import array
 import newjoy
 import machine
 
+from names import MAPPING
 
 class Protocol:
 
@@ -25,9 +24,13 @@ class Protocol:
         self.payload = None
         self._osc_spec = ""
         self._osc_payload_start = -1
-        self._osc_path = "/" + "".join(
-            [hex(c)[2:] for c in machine.unique_id()]
-        )
+        uid = machine.unique_id()
+        if uid in MAPPING:
+            self._osc_path = "/" + MAPPING[uid]
+        else:
+            self._osc_path = "/" + "".join(
+                [hex(c)[2:] for c in uid]
+            )
         self._osc_descriptor = {
             0: "",
             1: "",

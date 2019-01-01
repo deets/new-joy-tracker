@@ -5,7 +5,7 @@ import pathlib
 
 # 26 names to chose from
 POOL = {
-    "ANNA",
+    "ANNE",
     "BERT",
     "CARL",
     "DANA",
@@ -40,6 +40,7 @@ DB = pathlib.Path(__file__).parent / "names.db"
 
 LOADED = False
 
+
 def load():
     global LOADED, POOL, MAPPING
     if LOADED:
@@ -60,7 +61,7 @@ def save():
 
 def resolve(id_):
     load()
-    if not id_ in MAPPING:
+    if id_ not in MAPPING:
         if not POOL:
             raise Exception("name pool exhausted!")
         candidate = next(iter(POOL))
@@ -68,3 +69,13 @@ def resolve(id_):
         MAPPING[id_] = candidate
         save()
     return MAPPING[id_]
+
+
+if __name__ == '__main__':
+    import pprint
+    load()
+    pprint.pprint(MAPPING)
+    msb_ids = set(id_[:5] for id_ in MAPPING.keys())
+    if len(msb_ids) == len(MAPPING):
+        print("All msb ids are unique")
+    #print(msb_ids)
