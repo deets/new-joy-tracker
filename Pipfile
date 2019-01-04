@@ -13,7 +13,6 @@ bokeh = "*"
 nose-progressive = "*"
 nose = "*"
 pylint = "*"
-arpreq = "*"
 scipy = "*"
 esptool = "*"
 
