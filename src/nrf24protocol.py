@@ -88,7 +88,7 @@ def hub_work_in_c(spoke):
     return 0
 
 
-WORK_IN_C = False
+WORK_IN_C = True
 
 
 def hub(spokes):
@@ -100,13 +100,31 @@ def hub(spokes):
         # # in this special case, we need to
         # # sleep because the receiver is switching
         # # back
-        # if len(spokes) == 1:
-        #     utime.sleep_us(TX_SWITCH_DELAY_US * 10)
+        if len(spokes) == 1:
+            utime.sleep_us(TX_SWITCH_DELAY_US * 10)
         for j, spoke in enumerate(spokes):
             print("----------", i, j, failures)
-            utime.sleep_ms(2000)
-            print("ping")
             if WORK_IN_C:
                 failures += hub_work_in_c(spoke)
             else:
                 failures += hub_work_in_py(spoke)
+
+
+def spoke_setup(hub):
+    newjoy.nrf24_teardown()
+    # we transmit using our ID
+    newjoy.nrf24_setup(get_pipe_id())
+    newjoy.nrf24_open_rx_pipe(1, get_pipe_id(hub))
+    newjoy.nrf24_start_listening()
+
+
+def spoke_wait():
+    if newjoy.nrf24_any():
+        while newjoy.nrf24_any():
+            newjoy.nrf24_recv()
+        return True
+    return False
+
+
+def spoke_send(buffer):
+    newjoy.nrf24_spoke_to_hub_send(buffer)

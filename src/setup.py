@@ -6,13 +6,10 @@ import time
 import socket
 import mpu6050
 import bme280
-from uosc.client import Client
-
 
 from protocol import Protocol
-from wifi import setup_wifi
 from names import get_name
-from nrf24protocol import hub
+from nrf24protocol import spoke_setup, spoke_wait, spoke_send, hub
 
 # I2C 1 is missing due to some
 # system setup issue when the lines
@@ -57,6 +54,12 @@ LOOP_SLEEP_MS = 70
 SENSOR_PERIOD = 2  # in milliseconds
 I2C_FREQUENCY = 1000_000
 
+# The known spokes
+SPOKES = [
+    "OTTO",
+]
+HUB_NAME = "TIMO"
+
 
 def setup_i2c_busses():
     for busno, (scl, sda) in I2C_BUSSES:
@@ -97,39 +100,17 @@ def setup_all():
     return protocol
 
 
+
 def main():
     name = get_name()
-    print(name)
+    print("*** {} ***".format(name))
+    if name == HUB_NAME:
+        hub(SPOKES)
+
     protocol = setup_all()
-    if name == "OTTO":
-        hub(["IRIS"])
-    elif name == "IRIS":
-        pass
-
+    spoke_setup(HUB_NAME)
     while True:
-        try:
-            nic, destination_address = setup_wifi()
-            break
-        except Exception:
-            pass
-
-    reconnect_count = 0
-
-    osc = Client(destination_address, OSC_PORT)
-
-    while True:
-        print("connecting...")
-        try:
-            # s = setup_socket(nic)
-            while True:
-                protocol.update()
-                protocol.send_osc(osc)
-                # s.sendto(protocol.buffer, (destination_address, PORT))
-                time.sleep_ms(LOOP_SLEEP_MS)
-                machine.idle()
-        except OSError:
-            reconnect_count += 1
-            if reconnect_count > RESET_COUNT:
-                print("resetting hard")
-                machine.reset()
-            time.sleep(1)
+        if spoke_wait():
+            protocol.update()
+            spoke_send(protocol.buffer)
+        machine.idle()
