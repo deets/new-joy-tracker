@@ -12,7 +12,7 @@ from uosc.client import Client
 from protocol import Protocol
 from wifi import setup_wifi
 from names import get_name
-from nrf24protocol import hub, spoke
+from nrf24protocol import hub
 
 # I2C 1 is missing due to some
 # system setup issue when the lines
@@ -104,7 +104,7 @@ def main():
     if name == "OTTO":
         hub(["IRIS"])
     elif name == "IRIS":
-        spoke("OTTO")
+        pass
 
     while True:
         try:

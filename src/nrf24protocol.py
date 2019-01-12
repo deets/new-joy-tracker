@@ -2,16 +2,19 @@
 # Copyright: 2019, Diez B. Roggisch, Berlin . All rights reserved.
 import utime
 from micropython import const
-from machine import Pin, SPI
+# from machine import Pin, SPI
 from nrf24l01 import (
-    NRF24L01,
+#     NRF24L01,
     START_LISTENING_TIMEOUT_US,
-    POWER_0,
-    POWER_3,
-    SPEED_2M,
-    SPEED_250K,
-    )
+#     POWER_0,
+#     POWER_3,
+#     SPEED_2M,
+#     SPEED_250K,
+#     OBSERVE_TX,
+)
 from names import get_pipe_id
+from misc import measure, print_measurements, cycle
+import newjoy
 
 PIN_CFG = {
     'miso': 22,
@@ -20,105 +23,90 @@ PIN_CFG = {
     'csn': 5,
     'ce': 19
 }
-CHANNEL = const(46)
-POWER = POWER_3
-SPEED = SPEED_250K
+CHANNEL = const(124)
+# POWER = POWER_3
+# SPEED = SPEED_2M
 # timeout until we don't wait for a
 # spoke's response in ms
-RECEIVE_TIMEOUT_MS = const(25)
+RECEIVE_TIMEOUT_MS = const(100)
 # timeout to wait before sending in us. This
 # gives the hub time to switch to RX
 # The minimum is the START_LISTENING_TIMEOUT_US
 TX_SWITCH_DELAY_US = START_LISTENING_TIMEOUT_US + const(500)
 
 
-def create_nrf():
-    csn = Pin(PIN_CFG['csn'], mode=Pin.OUT, value=1)
-    ce = Pin(PIN_CFG['ce'], mode=Pin.OUT, value=0)
-    spi = SPI(
-        -1,
-        sck=Pin(PIN_CFG['sck']),
-        mosi=Pin(PIN_CFG['mosi']),
-        miso=Pin(PIN_CFG['miso']),
-    )
-    nrf = NRF24L01(
-        spi,
-        csn,
-        ce,
-        payload_size=4,
-        channel=CHANNEL,
-    )
-    nrf.set_power_speed(POWER, SPEED)
-    return nrf
+def ping(spoke):
+    error = newjoy.nrf24_send(b"PING")
+    if error != 1:
+        return False
+    return True
 
 
-def send_and_receive(spoke, nrf):
-    nrf.open_rx_pipe(1, get_pipe_id(spoke))
-    nrf.send(b"PING")
-    nrf.start_listening()
-    # wait for response, with timeout
-    start_time = utime.ticks_ms()
-    try:
-        while not nrf.any():
+def receive(spoke):
+    packets = []
+    while True:
+        start_time = utime.ticks_ms()
+        while not newjoy.nrf24_any():
             if utime.ticks_diff(utime.ticks_ms(), start_time) > \
                RECEIVE_TIMEOUT_MS:
-                print('failed, response timed out')
                 return
-        return nrf.recv()
-    finally:
-        nrf.stop_listening()
+        packet = newjoy.nrf24_recv()
+        packets.append(packet[2:2 + packet[1]])
+        if not packet[0]:
+            break
+    return b"".join(packets)
+
+
+@measure("hub_work_in_py")
+def hub_work_in_py(spoke):
+    newjoy.nrf24_open_rx_pipe(1, get_pipe_id(spoke))
+
+    if ping(spoke):
+        newjoy.nrf24_start_listening()
+        try:
+            answer = receive(spoke)
+        finally:
+            newjoy.nrf24_stop_listening()
+        if answer is None:
+            print('failed, response timed out')
+            return 1
+        else:
+            print(answer)
+            # only successful branch!
+            return 0
+    else:
+        return 1
+
+
+def hub_work_in_c(spoke):
+    try:
+        message = newjoy.nrf24_hub_to_spoke(get_pipe_id(spoke))
+        print(message)
+    except OSError as e:
+        print(e)
+        return 1
+    return 0
+
+
+WORK_IN_C = False
 
 
 def hub(spokes):
-    N = 100
+    newjoy.nrf24_teardown()
+    # we transmit using our ID
+    newjoy.nrf24_setup(get_pipe_id())
     failures = 0
-    timeouts = 0
-    max_elapsed = 0
-    avg_elapsed = 0.0
-    nrf = create_nrf()
-    # we transmit using our ID
-    nrf.open_tx_pipe(get_pipe_id())
-    while True:
-        for spoke in spokes:
-            then = utime.ticks_us()
-            try:
-                message = send_and_receive(spoke, nrf)
-                elapsed = utime.ticks_diff(utime.ticks_us(), then)
-                max_elapsed = max(max_elapsed, elapsed)
-                if message is not None:
-
-                    avg_elapsed -= avg_elapsed / N
-                    avg_elapsed += elapsed / N
-                    print("MSG:", message, max_elapsed, avg_elapsed)
-                else:
-                    timeouts += 1
-                    print("timeouts: ", timeouts)
-            except OSError:
-                failures += 1
-                print("failures: ", failures)
-
-
-
-def spoke(hub):
-    nrf = create_nrf()
-    # we transmit using our ID
-    nrf.open_tx_pipe(get_pipe_id())
-    nrf.open_rx_pipe(1, get_pipe_id(hub))
-    nrf.start_listening()
-    while True:
-        if nrf.any():
-            # receive potentially
-            # sereval messages. This
-            # should not happen but
-            # if so, just assume we're supposed
-            # to send afterwards
-            while nrf.any():
-                buf = nrf.recv()
-                #print("MSG:", buf)
-            utime.sleep_us(TX_SWITCH_DELAY_US)
-            nrf.stop_listening()
-            try:
-                nrf.send("PONG")
-            except OSError:
-                print(".")
-            nrf.start_listening()
+    for i in cycle():
+        # # in this special case, we need to
+        # # sleep because the receiver is switching
+        # # back
+        # if len(spokes) == 1:
+        #     utime.sleep_us(TX_SWITCH_DELAY_US * 10)
+        for j, spoke in enumerate(spokes):
+            print("----------", i, j, failures)
+            utime.sleep_ms(2000)
+            print("ping")
+            if WORK_IN_C:
+                failures += hub_work_in_c(spoke)
+            else:
+                failures += hub_work_in_py(spoke)

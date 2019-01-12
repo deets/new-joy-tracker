@@ -3,6 +3,7 @@
 
 from micropython import const
 import utime
+from misc import measure
 
 # nRF24L01+ registers
 CONFIG      = const(0x00)
@@ -12,6 +13,7 @@ SETUP_RETR  = const(0x04)
 RF_CH       = const(0x05)
 RF_SETUP    = const(0x06)
 STATUS      = const(0x07)
+OBSERVE_TX  = const(0x08)
 RX_ADDR_P0  = const(0x0a)
 TX_ADDR     = const(0x10)
 RX_PW_P0    = const(0x11)
@@ -54,6 +56,11 @@ NOP          = const(0xff)  # use to read STATUS register
 # it takes to switch to rx mode
 START_LISTENING_TIMEOUT_US = const(130)
 
+def my_print(*args):
+    #print(*args)
+    pass
+
+
 class NRF24L01:
     def __init__(self, spi, cs, ce, channel=46, payload_size=16, retries=4, retry_pause=3):
         assert payload_size <= 32
@@ -66,7 +73,7 @@ class NRF24L01:
         self.ce = ce
 
         # init the SPI bus and pins
-        self.init_spi(4000000)
+        self.init_spi(8_000_000)
 
         # reset everything
         ce.init(ce.OUT, value=0)
@@ -84,8 +91,6 @@ class NRF24L01:
         # disable dynamic payloads
         self.reg_write(DYNPD, 0)
 
-        # auto retransmit delay: 750us
-        # auto retransmit count: 4
         self.reg_write(SETUP_RETR, (retry_pause << 4) | retries)
 
         # set rf power and speed
@@ -120,6 +125,7 @@ class NRF24L01:
         return self.buf[0]
 
     def reg_write_bytes(self, reg, buf):
+        my_print("reg_write_bytes", reg, buf)
         self.cs(0)
         self.spi.readinto(self.buf, 0x20 | reg)
         self.spi.write(buf)
@@ -127,6 +133,7 @@ class NRF24L01:
         return self.buf[0]
 
     def reg_write(self, reg, value):
+        my_print("reg_write", reg, value)
         self.cs(0)
         self.spi.readinto(self.buf, 0x20 | reg)
         ret = self.buf[0]
@@ -218,6 +225,7 @@ class NRF24L01:
         return buf
 
     # blocking wait for tx complete
+    @measure("send")
     def send(self, buf, timeout=500):
         self.send_start(buf)
         start = utime.ticks_ms()
@@ -230,6 +238,7 @@ class NRF24L01:
             raise OSError("send failed")
 
     # non-blocking tx
+    @measure("send_start")
     def send_start(self, buf):
         # power up
         self.reg_write(CONFIG, (self.reg_read(CONFIG) | PWR_UP) & ~PRIM_RX)
@@ -249,6 +258,7 @@ class NRF24L01:
         self.ce(0)
 
     # returns None if send still in progress, 1 for success, 2 for fail
+    @measure("send_done")
     def send_done(self):
         if not (self.reg_read(STATUS) & (TX_DS | MAX_RT)):
             return None  # tx not finished
