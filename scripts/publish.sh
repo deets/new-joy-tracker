@@ -69,6 +69,7 @@ def collect_files(src_dir, force=False, files=[]):
 def publish(path, port):
     cmd = [
         "ampy",
+        "-b", "460800",
         "--port", port,
         "put",
         path,
