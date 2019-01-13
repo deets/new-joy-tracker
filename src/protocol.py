@@ -82,6 +82,7 @@ class Protocol:
             padding = 4 - (payload_start % 4)
             payload_start += padding
             buffer_size += padding
+        self.payload_start = payload_start
         self.buffer = bytearray(buffer_size)
         self.buffer[0] = ord(b'#')
         self.buffer[1] = buffer_size
@@ -113,6 +114,12 @@ class Protocol:
 
     def update(self):
         newjoy.sync()
+        crc = 0
+        for b in self.buffer[3:-1]:
+            crc += b
+        crc &= 0xff
+        self.buffer[-1] = crc
+        return bytearray(self.buffer)
 
     def send_osc(self, osc):
         args = ustruct.unpack_from(

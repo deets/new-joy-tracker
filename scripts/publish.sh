@@ -9,6 +9,7 @@ from common import DEFAULT_SERIAL_PORT
 
 SRC_DIR = os.path.join(os.path.dirname(__file__), "../src")
 TAG_DIR = "/tmp"
+BAUD = 460800
 
 
 def hash_file(path):
@@ -69,7 +70,7 @@ def collect_files(src_dir, force=False, files=[]):
 def publish(path, port):
     cmd = [
         "ampy",
-        "-b", "460800",
+        "-b", str(BAUD),
         "--port", port,
         "put",
         path,

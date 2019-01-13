@@ -111,6 +111,6 @@ def main():
     spoke_setup(HUB_NAME)
     while True:
         if spoke_wait():
-            protocol.update()
-            spoke_send(protocol.buffer)
+            print(".", end="")
+            spoke_send(protocol.update())
         machine.idle()
