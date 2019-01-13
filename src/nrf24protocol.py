@@ -50,12 +50,12 @@ def hub(spokes):
     newjoy.nrf24_setup(get_pipe_id())
     failures = 0
     for i in cycle():
-        # # in this special case, we need to
-        # # sleep because the receiver is switching
-        # # back
-        if len(spokes) == 1:
-            utime.sleep_us(TX_SWITCH_DELAY_US)
         for spoke in spokes:
+            # # in this special case, we need to
+            # # sleep because the receiver is switching
+            # # back
+            if len(spokes) == 1:
+                utime.sleep_us(TX_SWITCH_DELAY_US)
             failures += hub_work_in_c(spoke)
 
 
