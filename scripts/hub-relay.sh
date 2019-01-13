@@ -1,26 +1,14 @@
 #!/usr/bin/env python3.6
-# -*- mode: python -*-
+# -*- code: python -*-
+import os
 import sys
-import serial
 
-BAUD = 460800
-
-
-p = serial.Serial(
-    sys.argv[1],
-    BAUD,
+sys.path.append(
+    os.path.join(
+        os.path.dirname(__file__),
+        "..",
+    )
 )
 
-
-class HubDecoder:
-
-    def __init__(self):
-        self._buffer = b''
-
-
-    def feed(self, bytestring):
-
-while True:
-    count = p.inWaiting()
-    if count:
-        print(p.read(count))
+from newjoy.hub_relay import main
+main()

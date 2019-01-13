@@ -15,6 +15,7 @@ from pythonosc import udp_client
 from .util import PackageParser
 from .naming import resolve
 from .logger import Logger
+from .common import core_argument_parser, core_app_setup
 
 DEFAULT_UDP_PORT = 5005
 DEFAULT_SERVER_PORT = 5000
@@ -124,18 +125,20 @@ class Server(object):
         self._loop.run_forever()
 
 
-def main():
-    parser = argparse.ArgumentParser()
+def parse_args():
+    parser = core_argument_parser()
     parser.add_argument("destination", help="Destination UDP IP")
     parser.add_argument("--port", help="Destination UDP port", default=DEFAULT_UDP_PORT)
     parser.add_argument("-v", "--visualise", help="Send OSC to visualisation server, the format for this argument is ip:port")
-    parser.add_argument("-d", "--debug", action="store_true")
     parser.add_argument("-l", "--log")
-    opts = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.DEBUG if opts.debug else logging.INFO,
-    )
+    opts = parser.parse_args()
+    core_app_setup(opts)
+    return opts
+
+
+def main():
+    opts = parse_args()
 
     client = udp_client.UDPClient(opts.destination, opts.port)
 

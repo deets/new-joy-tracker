@@ -3,6 +3,8 @@
 import struct
 import logging
 
+from .naming import resolve
+
 logger = logging.getLogger(__name__)
 
 TASKS = {
@@ -18,7 +20,7 @@ TASK_CONFIG = {
 
 class PackageParser:
 
-    def __init__(self, resolve):
+    def __init__(self, resolve=resolve):
         self.invalid_count = 0
         self._resolve = resolve
         self._parsers = {}
@@ -36,7 +38,7 @@ class PackageParser:
         length_inv = data[2]
         if length != length_inv ^ 0xff:
             logger.debug("malformed data, length field inconsistent")
-            return
+            return []
 
         if len(data) != length:
             logger.debug("malformed data, length field and length of data mismatch")
@@ -44,7 +46,7 @@ class PackageParser:
         name = self._resolve(id_)
         if name not in self._parsers:
             self._parsers[name] = self._setup_parser(data, name)
-        return name, self._parsers[name](data)
+        return [(name, self._parsers[name](data))]
 
     def _setup_parser(self, data, name):
         start = 1 + 2 + 6  # start marker (#), length, esp32 id

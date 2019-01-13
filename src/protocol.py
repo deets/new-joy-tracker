@@ -47,7 +47,7 @@ class Protocol:
         task_num = len(self._tasks)
         # we have a start-character, '#'
         start_char = 1
-        # after that start character, we follow up with the of the
+        # after that start character, we follow up with the length of the
         # total message.  It's the length in one byte, followd by the
         # XOR of that length.  The reason for this verified storage is
         # that we need a reliable way of syncing after the start-char
@@ -87,6 +87,7 @@ class Protocol:
         self.buffer[0] = ord(b'#')
         self.buffer[1] = buffer_size
         self.buffer[2] = 0xff ^ buffer_size
+        print(buffer_size, 0xff ^ buffer_size)
         self.buffer[name_start:name_start + name_length] = name
         self.buffer[descriptor_byte_count_offset] = task_num
 
