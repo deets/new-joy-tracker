@@ -57,14 +57,13 @@ def hub(spokes):
             # # back
             if len(spokes) == 1:
                 utime.sleep_us(TX_SWITCH_DELAY_US)
-            utime.sleep_ms(1000)
-            failures += hub_work_in_c(spoke)
             failures += hub_work_in_c(spoke)
 
 def spoke_setup(hub):
     newjoy.nrf24_teardown()
     # we transmit using our ID
-    newjoy.nrf24_setup(get_pipe_id())
+    spoke_id = get_pipe_id()
+    newjoy.nrf24_setup(spoke_id)
     newjoy.nrf24_start_listening()
 
 
