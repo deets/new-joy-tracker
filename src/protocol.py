@@ -22,7 +22,7 @@ class Protocol:
         self._tasks = []
         self.buffer = None
         self.payload = None
-        self._osc_spec = ""
+        self._osc_spec = []
         self._osc_payload_start = -1
         uid = machine.unique_id()
         if uid in MAPPING:
@@ -93,10 +93,15 @@ class Protocol:
             descriptor_start:descriptor_start+descriptor_length
         ]
         newjoy.init(sensor_period, self.buffer)
-        self._osc_payload_start = task_byte_offset = payload_start
+        osc_payload_start = task_byte_offset = payload_start
 
         for i, (bus, address, task, task_size, busno) in enumerate(self._tasks):
-            self._osc_spec += self.TASK_SPEC[task]
+            self._osc_spec.append(
+                (
+                    osc_payload_start,
+                    self.TASK_SPEC[task],
+                )
+            )
             self._osc_descriptor[busno] += self.TASK_ID[task]
             offset = i // 2
             current = descriptor[offset]
@@ -115,9 +120,10 @@ class Protocol:
         newjoy.sync()
 
     def send_osc(self, osc):
-        args = ustruct.unpack_from(
-            self._osc_spec,
-            self.buffer,
-            self._osc_payload_start,
-        )
-        osc.send(self._osc_path, *((self._osc_descriptor,) + args))
+        for i, (osc_payload_start, spec) in enumerate(self._osc_spec):
+            args = ustruct.unpack_from(
+                spec,
+                self.buffer,
+                osc_payload_start,
+            )
+            osc.send(self._osc_path, i, *args)
