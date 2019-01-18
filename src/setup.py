@@ -59,7 +59,7 @@ SPOKES = [
     "OTTO",
     "IRIS",
 ]
-HUB_NAME = "TIMO"
+HUB_NAME = "SINA"
 
 
 def setup_i2c_busses():

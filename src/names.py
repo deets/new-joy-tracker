@@ -17,6 +17,7 @@ MAPPING = {
     b'\xb4\xe6-\xbfB\xa1': 'WOUT',
     b'\xb4\xe6-\xbf\xda\xb5': 'OTTO',
     b'0\xae\xa4\x90\x16\x1c': 'TIMO',
+    b'0\xae\xa4\x84\xc8\x88': 'SINA',
 }
 
 

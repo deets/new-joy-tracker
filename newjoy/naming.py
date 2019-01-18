@@ -75,6 +75,7 @@ if __name__ == '__main__':
     import pprint
     load()
     pprint.pprint(MAPPING)
+    #print(resolve(b'0\xae\xa4\x84\xc8\x88')
     msb_ids = set(id_[:5] for id_ in MAPPING.keys())
     if len(msb_ids) == len(MAPPING):
         print("All msb ids are unique")
