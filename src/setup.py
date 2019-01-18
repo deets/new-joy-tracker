@@ -85,13 +85,13 @@ def setup_all():
                 )
             )
             mpu6050.register_on_protocol(i2c, address, protocol, busno)
-        for address in bme280.present_on_bus(i2c):
-            print("found bmp280 @{}:{}, registering with protocol".format(
-                busno,
-                address,
-                )
-            )
-            bme280.register_on_protocol(i2c, address, protocol, busno)
+        # for address in bme280.present_on_bus(i2c):
+        #     print("found bmp280 @{}:{}, registering with protocol".format(
+        #         busno,
+        #         address,
+        #         )
+        #     )
+        #     bme280.register_on_protocol(i2c, address, protocol, busno)
 
     protocol.assemble(SENSOR_PERIOD)
     return protocol
