@@ -13,43 +13,44 @@ from names import get_pipe_id
 TX_SWITCH_DELAY_US = 150
 BOOT_PIN = 0
 
-WRITE_RAW = True
+DEBUG_MODE = False
 
 
 def hub_work_in_c(spoke):
     try:
         message = newjoy.nrf24_hub_to_spoke(get_pipe_id(spoke))
-        if WRITE_RAW:
+        if not DEBUG_MODE:
             sys.stdout.write(message)
     except OSError as e:
-        print(spoke, e)
+        if DEBUG_MODE:
+            print(spoke, e)
         return 1
     return 0
 
 
-def toggle_raw(pin):
-    global WRITE_RAW
-    WRITE_RAW = not WRITE_RAW
+def toggle_debug(pin):
+    global DEBUG_MODE
+    DEBUG_MODE = not DEBUG_MODE
 
 
-def setup_raw_toggle():
+def setup_debug_toggle():
     p = machine.Pin(
         BOOT_PIN,
         machine.Pin.IN,
         machine.Pin.PULL_UP,
     )
-    p.irq(trigger=machine.Pin.IRQ_FALLING, handler=toggle_raw)
+    p.irq(trigger=machine.Pin.IRQ_FALLING, handler=toggle_debug)
 
 
 def hub(spokes):
-    setup_raw_toggle()
+    setup_debug_toggle()
     newjoy.nrf24_teardown()
     # we transmit using our ID
     newjoy.nrf24_setup(get_pipe_id())
     failures = 0
     for i in cycle():
         for spoke in spokes:
-            if not WRITE_RAW:
+            if DEBUG_MODE:
                 print(i, spoke)
                 print(newjoy.nrf24_error_info())
             # # in this special case, we need to
