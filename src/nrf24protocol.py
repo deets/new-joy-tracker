@@ -21,10 +21,8 @@ def hub_work_in_c(spoke):
         message = newjoy.nrf24_hub_to_spoke(get_pipe_id(spoke))
         if WRITE_RAW:
             sys.stdout.write(message)
-        else:
-            print(message)
     except OSError as e:
-        print(e)
+        print(spoke, e)
         return 1
     return 0
 
@@ -51,19 +49,22 @@ def hub(spokes):
     failures = 0
     for i in cycle():
         for spoke in spokes:
+            if not WRITE_RAW:
+                print(i, spoke)
+                print(newjoy.nrf24_error_info())
             # # in this special case, we need to
             # # sleep because the receiver is switching
             # # back
             if len(spokes) == 1:
                 utime.sleep_us(TX_SWITCH_DELAY_US)
+            utime.sleep_ms(1000)
             failures += hub_work_in_c(spoke)
-
+            failures += hub_work_in_c(spoke)
 
 def spoke_setup(hub):
     newjoy.nrf24_teardown()
     # we transmit using our ID
     newjoy.nrf24_setup(get_pipe_id())
-    newjoy.nrf24_open_rx_pipe(1, get_pipe_id(hub))
     newjoy.nrf24_start_listening()
 
 

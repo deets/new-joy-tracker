@@ -57,6 +57,7 @@ I2C_FREQUENCY = 1000_000
 # The known spokes
 SPOKES = [
     "OTTO",
+    "IRIS",
 ]
 HUB_NAME = "TIMO"
 

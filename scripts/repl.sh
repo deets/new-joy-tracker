@@ -6,4 +6,5 @@ elif [ -e /dev/tty.SLAB_USBtoUART ]; then
 else
     PORT=/dev/ttyUSB0
 fi
+
 screen $PORT 460800

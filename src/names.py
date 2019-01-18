@@ -35,4 +35,4 @@ def get_pipe_id(name=None):
         else:
             raise Exception("No id for name {} found".format(name))
 
-    return id_[:5]
+    return bytearray(MAPPING[id_]) + b"\0"
