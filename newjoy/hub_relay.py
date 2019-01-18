@@ -2,6 +2,11 @@
 import serial
 import logging
 import struct
+import time
+
+from pythonosc import osc_message_builder
+from pythonosc import udp_client
+
 
 from .common import (
     core_argument_parser,
@@ -20,6 +25,10 @@ class PackageParser:
         1: "MPU6050",
         2: "BMP280",
     }
+    OSC_DESCRIPTORS = {
+        1: ("i", 7),
+        2: ("p", 1)
+    }
 
     TASK_CONFIG = {
         "MPU6050": "fffffff",
@@ -29,18 +38,30 @@ class PackageParser:
     def __init__(self, resolve=resolve):
         self._resolve = resolve
         self._parsers = {}
+        self._descriptors = {}
+        self._last_message = {}
+
 
     def feed(self, package):
+        now = time.monotonic()
         id_ = package[3:3 + 6]
         name = self._resolve(id_)
 
         if name not in self._parsers:
-            self._parsers[name] = self._setup_parser(
+            self._parsers[name], self._descriptors[name] = self._setup_parser(
                 package,
                 name,
             )
+            self._last_message[name] = now
 
-        return (name, self._parsers[name](package))
+        packet_diff = now - self._last_message[name]
+        self._last_message[name] = now
+        return (
+            name,
+            self._descriptors[name],
+            self._parsers[name](package),
+            packet_diff,
+        )
 
     def _setup_parser(self, data, name):
         start = 1 + 2 + 6  # start marker (#), length, esp32 id
@@ -57,11 +78,14 @@ class PackageParser:
         format = ""
         payload_length = 0
 
+        osc_descriptor = []
+
         for i in range(task_num):
             kind = descriptor[i // 2]
             kind >>= 4 * (i % 2)
             kind &= 0xf
             task_type = self.TASKS[kind]
+            osc_descriptor.append(self.OSC_DESCRIPTORS[kind])
             logger.info("%i task is %s", i + 1, task_type)
             task_format = self.TASK_CONFIG[task_type]
             payload_length += struct.calcsize(task_format)
@@ -69,7 +93,13 @@ class PackageParser:
 
         logger.info("%s payload_length: %i", name, payload_length)
         format = "<{}".format(format)
-        return lambda data: struct.unpack(format, data[payload_start:payload_start + payload_length])
+        return (
+            lambda data: struct.unpack(
+                format,
+                data[payload_start:payload_start + payload_length]
+            ),
+            osc_descriptor,
+        )
 
 
 class BaseProtocolParser:
@@ -133,9 +163,26 @@ def parse_args():
     parser = core_argument_parser()
     parser.add_argument("--baud", default=DEFAULT_BAUD, type=int)
     parser.add_argument("--port", default=DEFAULT_SERIAL_PORT)
+    parser.add_argument("--osc-port", default=10000)
+    parser.add_argument("--osc-host", default="localhost")
     opts = parser.parse_args()
     core_app_setup(opts)
     return opts
+
+
+def send_osc_message(client, name, descriptor, payload):
+    b = osc_message_builder.OscMessageBuilder("/{}".format(name))
+    b.add_arg("".join(k for k, _ in descriptor))
+    for v in payload:
+        b.add_arg(v)
+    client.send(b.build())
+
+
+def send_visualisation_message(vis_client, name, packet_diff):
+    b = osc_message_builder.OscMessageBuilder("/{}".format(name))
+    b.add_arg(time.monotonic())
+    b.add_arg(packet_diff)
+    vis_client.send(b.build())
 
 
 def main():
@@ -147,12 +194,16 @@ def main():
     parser = BaseProtocolParser()
     package_parser = PackageParser()
     message_count = 0
+    client = udp_client.UDPClient(opts.osc_host, opts.osc_port)
+    vis_client = udp_client.UDPClient(opts.osc_host, 11111)
     while True:
         count = p.inWaiting()
         if count:
             data = p.read(count)
             for message in parser.feed(data):
-                print(package_parser.feed(message))
+                name, descriptor, payload, packet_diff = package_parser.feed(message)
+                send_osc_message(client, name, descriptor, payload)
+                send_visualisation_message(vis_client, name, packet_diff)
 
             logger.debug(
                 "messages: {} bytes: {} message-chars: {} lost-chars: {} loss-rate {:2.1f} buffer-length: {}".format(

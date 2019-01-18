@@ -21,7 +21,7 @@ class BoardInfo:
     # the names of the columns
     # per OSC packet. The name is special,
     # it's of course not displayed in every update.
-    COLUMNS = ["name", "pressure", "gyro_x", "gyro_y", "gyro_z", "acc_x", "acc_y", "acc_z", "packet_diff"]
+    COLUMNS = ["name", "packet_diff"]
 
     HEIGHT = 250
 
@@ -64,15 +64,14 @@ def schedule_update(
         doc, clients, layout,
         # All following arguments are from the OSC package
         path,
-        name,
         *args
         ):
-    if name not in clients:
-        clients[name] = BoardInfo(name, layout)
+    if path not in clients:
+        clients[path] = BoardInfo(path, layout)
 
     # update the document from callback
     doc.add_next_tick_callback(
-        partial(clients[name].update, datetime.now(), *args)
+        partial(clients[path].update, *args)
     )
 
 
@@ -82,15 +81,14 @@ def main():
     # This is important! Save curdoc() to make sure all threads
     # see the same document.
     doc = curdoc()
-    #thingy = Surface3d(x="gyro_x", y="gyro_y", z="gyro_z", data_source=source)
     layout = column(children=[], sizing_mode='stretch_both')
     doc.add_root(layout)
-    # mapping of name to ClientInfo
     clients = {}
     disp = dispatcher.Dispatcher()
-    disp.map("/filter", partial(schedule_update, doc, clients, layout))
-    server = osc_server.BlockingOSCUDPServer(("localhost", 10000), disp)
+    disp.map("/*", partial(schedule_update, doc, clients, layout))
+    server = osc_server.BlockingOSCUDPServer(("localhost", 11111), disp)
     server_thread = threading.Thread(target=server.serve_forever)
     server_thread.start()
+
 
 main()
