@@ -9,7 +9,6 @@ from common import DEFAULT_SERIAL_PORT
 
 SRC_DIR = os.path.join(os.path.dirname(__file__), "../src")
 TAG_DIR = "/tmp"
-BAUD = 460800
 
 
 def hash_file(path):
@@ -67,10 +66,10 @@ def collect_files(src_dir, force=False, files=[]):
             ]
 
 
-def publish(path, port):
+def publish(path, port, baud):
     cmd = [
         "ampy",
-        "-b", str(BAUD),
+        "-b", str(baud),
         "--port", port,
         "put",
         path,
@@ -94,6 +93,12 @@ def main():
         help="USB serial port to use.",
     )
     parser.add_argument(
+        "--baud",
+        default=460800,
+        type=int,
+        help="Speed to use.",
+    )
+    parser.add_argument(
         "files",
         nargs="*",
         help="List of filenames to limit publishing to",
@@ -101,7 +106,7 @@ def main():
     opts = parser.parse_args()
     files = collect_files(SRC_DIR, opts.force, opts.files)
     for file in files:
-        publish(file, opts.port)
+        publish(file, opts.port, opts.baud)
 
 if __name__ == '__main__':
     main()

@@ -60,7 +60,8 @@ def hub(spokes):
                 utime.sleep_us(TX_SWITCH_DELAY_US)
             failures += hub_work_in_c(spoke)
 
-def spoke_setup(hub):
+
+def spoke_setup():
     newjoy.nrf24_teardown()
     # we transmit using our ID
     spoke_id = get_pipe_id()
