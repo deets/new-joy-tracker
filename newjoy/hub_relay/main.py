@@ -4,8 +4,10 @@ import logging
 import select
 
 import serial
-from pythonosc import osc_message_builder
-from pythonosc import udp_client
+from pythonosc import (
+    osc_message_builder,
+    udp_client,
+)
 
 from ..common import (
     core_argument_parser,
@@ -33,10 +35,13 @@ def parse_args():
 
 def send_osc_message(client, name, descriptor, payload):
     b = osc_message_builder.OscMessageBuilder("/{}".format(name))
-    b.add_arg("".join(k for k, _ in descriptor))
-    for v in payload:
-        b.add_arg(v)
-    client.send(b.build())
+    try:
+        b.add_arg("".join(k for k, _ in descriptor))
+        for v in payload:
+            b.add_arg(v)
+        client.send(b.build())
+    except osc_message_builder.BuildError:
+        logger.error(("OSC build error", name, descriptor, payload))
 
 
 def send_visualisation_message(vis_client, name, packet_diff):
@@ -61,6 +66,7 @@ def main():
     while True:
         select.select([p], [], [])
         data = p.read()
+        stats.timestamp("SERIAL")
         for message in parser.feed(data):
             message_type, data = package_parser.feed(message)
             if message_type == "S":
