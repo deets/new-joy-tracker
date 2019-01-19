@@ -11,4 +11,5 @@ sys.path.append(
 )
 
 from newjoy.hub_relay import main
+
 main()
