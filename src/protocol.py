@@ -157,7 +157,6 @@ class Protocol:
 def assemble_hub_status_message(max_deltas, buffer=None):
     # header, length, name, type,
     total_length = 1 + 2 + 6 + 1 + ((4 + 4) * len(max_deltas)) + 1
-    print("total_length", total_length)
     if buffer is None or len(buffer) != total_length:
         buffer = bytearray(total_length)
     buffer[0] = ord(b'#')
