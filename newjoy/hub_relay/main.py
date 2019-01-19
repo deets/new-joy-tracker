@@ -1,6 +1,7 @@
 # -*- mode: python -*-
 import time
 import logging
+import select
 
 import serial
 from pythonosc import osc_message_builder
@@ -58,24 +59,23 @@ def main():
     client = udp_client.UDPClient(opts.osc_host, opts.osc_port)
     vis_client = udp_client.UDPClient(opts.osc_host, 11111)
     while True:
-        count = p.inWaiting()
-        if count:
-            data = p.read(count)
-            for message in parser.feed(data):
-                message_type, data = package_parser.feed(message)
-                if message_type == "S":
-                    name, descriptor, payload, packet_diff = data
-                    stats.feed(name, packet_diff)
-                    send_osc_message(client, name, descriptor, payload)
-                    send_visualisation_message(vis_client, name, packet_diff)
-                elif message_type == "H":
-                    logger.info("HUB status data: %r", data)
-                    logger.info("Serial package stats: %s", str(stats))
-                    logger.info(
-                        "messages: {} bytes: {} message-chars: {} lost-chars: {} loss-rate {:2.1f} buffer-length: {}".format(
-                            message_count, parser.total_chars, parser.message_chars,parser.lost_chars, (parser.lost_chars / parser.total_chars) * 100, len(parser)
-                        )
+        select.select([p], [], [])
+        data = p.read()
+        for message in parser.feed(data):
+            message_type, data = package_parser.feed(message)
+            if message_type == "S":
+                name, descriptor, payload, packet_diff = data
+                stats.feed(name, packet_diff)
+                send_osc_message(client, name, descriptor, payload)
+                send_visualisation_message(vis_client, name, packet_diff)
+            elif message_type == "H":
+                logger.info("HUB status data: %r", data)
+                logger.info("Serial package stats: %s", str(stats))
+                logger.info(
+                    "messages: {} bytes: {} message-chars: {} lost-chars: {} loss-rate {:2.1f} buffer-length: {}".format(
+                        message_count, parser.total_chars, parser.message_chars,parser.lost_chars, (parser.lost_chars / parser.total_chars) * 100, len(parser)
                     )
+                )
 
 if __name__ == '__main__':
     main()
