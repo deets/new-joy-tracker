@@ -52,7 +52,7 @@ class ParserTests(unittest.TestCase):
     def test_package_parsing(self):
         package = b'#)\xd6\xb4\xe6-\xbf\xda\xb5\x01\x01\x00T\x91\x7f?\x96>;:z\x13\xc7\xb9\x18\xde\xa4\xba\x00\x00`:\x00\x00\xb0:\x00x~?>'
         package_parser = PackageParser()
-        name, imu = package_parser.feed(package)
+        name, descriptor, imu, packet_diff = package_parser.feed(package)
         for a, b in zip(
             (0.9983112812042236, 0.0007142809918150306, -0.0003797074896283448, -0.0012578396126627922, 0.0008544921875, 0.0013427734375, 0.9940185546875),
             imu
