@@ -20,11 +20,11 @@ SPOKE_SUCCESSFUL_RECEIVE_TIMESTAMP = {}
 SPOKE_MAX_TS_DELTAS = {}
 
 
-def hub_work_in_c(spoke):
+def hub_work_in_c(spoke, uart):
     try:
         message = newjoy.nrf24_hub_to_spoke(get_pipe_id(spoke))
         if not DEBUG_MODE:
-            sys.stdout.write(message)
+            uart.write(message)
             now = utime.ticks_ms()
             if spoke in SPOKE_SUCCESSFUL_RECEIVE_TIMESTAMP:
                 delta = utime.ticks_diff(
@@ -68,6 +68,8 @@ def hub(spokes):
     newjoy.nrf24_setup(get_pipe_id())
     failures = 0
     status_buffer = None
+    uart = machine.UART(2)
+
     for i in cycle():
         for spoke in spokes:
             if DEBUG_MODE:
@@ -85,14 +87,14 @@ def hub(spokes):
             # # back
             if len(spokes) == 1:
                 utime.sleep_us(TX_SWITCH_DELAY_US)
-            failures += hub_work_in_c(spoke)
+            failures += hub_work_in_c(spoke, uart)
 
         if i % 1000 == 0 and not DEBUG_MODE:
             status_buffer = assemble_hub_status_message(
                 SPOKE_MAX_TS_DELTAS,
                 status_buffer,
             )
-            sys.stdout.write(status_buffer)
+            uart.write(status_buffer)
             # empty these, as otherwise our own
             # gathering and sending would unduly influence
             # this metric
