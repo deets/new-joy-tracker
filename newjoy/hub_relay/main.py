@@ -71,13 +71,11 @@ def main():
                 elif message_type == "H":
                     logger.info("HUB status data: %r", data)
                     logger.info("Serial package stats: %s", str(stats))
-
-            logger.debug(
-                "messages: {} bytes: {} message-chars: {} lost-chars: {} loss-rate {:2.1f} buffer-length: {}".format(
-                    message_count, parser.total_chars, parser.message_chars,parser.lost_chars, (parser.lost_chars / parser.total_chars) * 100, len(parser)
-                )
-            )
-            logger.debug(str(stats))
+                    logger.info(
+                        "messages: {} bytes: {} message-chars: {} lost-chars: {} loss-rate {:2.1f} buffer-length: {}".format(
+                            message_count, parser.total_chars, parser.message_chars,parser.lost_chars, (parser.lost_chars / parser.total_chars) * 100, len(parser)
+                        )
+                    )
 
 if __name__ == '__main__':
     main()
