@@ -56,10 +56,10 @@ I2C_FREQUENCY = 1000_000
 
 # The known spokes
 SPOKES = [
-    "OTTO",
+    #"OTTO",
     "IRIS",
 ]
-HUB_NAME = "SINA"
+HUB_NAME = "OTTO"
 
 
 def setup_i2c_busses():
