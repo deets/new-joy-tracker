@@ -22,9 +22,8 @@ SPOKE_MAX_TS_DELTAS = {}
 
 def hub_work_in_c(spoke, uart):
     try:
-        message = newjoy.nrf24_hub_to_spoke(get_pipe_id(spoke))
+        newjoy.nrf24_hub_to_spoke(get_pipe_id(spoke), 2) # use uart 2
         if not DEBUG_MODE:
-            uart.write(message)
             now = utime.ticks_ms()
             if spoke in SPOKE_SUCCESSFUL_RECEIVE_TIMESTAMP:
                 delta = utime.ticks_diff(
@@ -36,8 +35,6 @@ def hub_work_in_c(spoke, uart):
                     SPOKE_MAX_TS_DELTAS.get(spoke, 0),
                 )
             SPOKE_SUCCESSFUL_RECEIVE_TIMESTAMP[spoke] = now
-        else:
-            print(repr(message))
     except OSError as e:
         if DEBUG_MODE:
             print(spoke, e)
@@ -87,6 +84,7 @@ def hub(spokes):
             # # back
             if len(spokes) == 1:
                 utime.sleep_us(TX_SWITCH_DELAY_US)
+
             failures += hub_work_in_c(spoke, uart)
 
         if i % 1000 == 0 and not DEBUG_MODE:
