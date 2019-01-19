@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 # Copyright: 2018, Diez B. Roggisch, Berlin . All rights reserved.
 import ustruct
+import utime
 import newjoy
 import machine
 
-from names import MAPPING
+from names import MAPPING, get_name
+
+SENSOR_MESSAGE = ord(b'S')
 
 class Protocol:
 
@@ -42,7 +45,7 @@ class Protocol:
         self._tasks.append((bus, address, task, buffer_size, busno))
 
     def assemble(self, sensor_period):
-        name = machine.unique_id()
+        name = bytearray(get_name()) + b"\0\0"
         assert len(name) == 6
         task_num = len(self._tasks)
         # we have a start-character, '#'
@@ -55,6 +58,8 @@ class Protocol:
         message_length = 2
         # Then comes the unique ID of the device, 6 bytes
         name_length = len(name)
+        # Then the message type. This is constant 1 for sensor messages
+        type_length = 1
         # After that, the task count and descriptor. The descriptor specifies
         # the attached sensors/tasks, that all have a specific byte-size.
         # Each sensor is described as a nibble, with the first in the lowest
@@ -70,26 +75,31 @@ class Protocol:
         # the final checksum is just all bytes so far summed up as uint8_t
         checksum_size = 1
         buffer_size = start_char + message_length + name_length + \
-          task_count + descriptor_length + \
-          payload_size + checksum_size
+            type_length + task_count + descriptor_length + \
+            payload_size + checksum_size
 
         name_start = start_char + message_length
-        descriptor_byte_count_offset = start_char + \
-            message_length + name_length
+        type_start = name_start + name_length
+        descriptor_byte_count_offset = type_start + type_length
         descriptor_start = descriptor_byte_count_offset + task_count
-        payload_start = descriptor_start + descriptor_length
+        original_payload_start = payload_start = descriptor_start + descriptor_length
+        padding = 0
         if payload_start % 4:
             padding = 4 - (payload_start % 4)
             payload_start += padding
             buffer_size += padding
+            print("added {} padding".format(padding))
         self.payload_start = payload_start
         self.buffer = bytearray(buffer_size)
         self.buffer[0] = ord(b'#')
         self.buffer[1] = buffer_size
         self.buffer[2] = 0xff ^ buffer_size
-        print(buffer_size, 0xff ^ buffer_size)
         self.buffer[name_start:name_start + name_length] = name
+        self.buffer[type_start] = SENSOR_MESSAGE
         self.buffer[descriptor_byte_count_offset] = task_num
+
+        for i in range(padding):
+            self.buffer[original_payload_start + i] = ord(b'P')
 
         descriptor = memoryview(self.buffer)[
             descriptor_start:descriptor_start+descriptor_length
@@ -104,7 +114,11 @@ class Protocol:
             current = descriptor[offset]
             current |= task << (4 * (i % 2))
             descriptor[offset] = current
-            newjoy.add_task(bus, address, task, task_byte_offset)
+            try:
+                newjoy.add_task(bus, address, task, task_byte_offset)
+            except ValueError:
+                print((bus, address, task, task_byte_offset))
+                raise
             task_byte_offset += task_size
 
         osc_descriptor = ""
@@ -112,6 +126,8 @@ class Protocol:
             if devices:
                 osc_descriptor += "{}{}".format(busno, devices)
         self._osc_descriptor = osc_descriptor
+        print(self.buffer)
+        utime.sleep_ms(100)
 
     def update(self):
         newjoy.sync()
@@ -120,6 +136,7 @@ class Protocol:
             crc += b
         crc &= 0xff
         self.buffer[-1] = crc
+        # print(self.buffer)
         return bytearray(self.buffer)
 
     def send_osc(self, osc):

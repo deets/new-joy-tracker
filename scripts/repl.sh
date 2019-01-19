@@ -7,4 +7,9 @@ else
     PORT=/dev/ttyUSB0
 fi
 
-screen $PORT 460800
+if [ $# == 2]; then
+    BAUD=$2
+else
+    BAUD=460800
+fi
+screen $PORT $BAUD

@@ -41,11 +41,10 @@ class PackageParser:
         self._descriptors = {}
         self._last_message = {}
 
-
     def feed(self, package):
         now = time.monotonic()
         id_ = package[3:3 + 6]
-        name = self._resolve(id_)
+        name = id_[:-2]
 
         if name not in self._parsers:
             self._parsers[name], self._descriptors[name] = self._setup_parser(
@@ -64,7 +63,7 @@ class PackageParser:
         )
 
     def _setup_parser(self, data, name):
-        start = 1 + 2 + 6  # start marker (#), length, esp32 id
+        start = 1 + 2 + 6 + 1  # start marker (#), length, esp32 id, type_flag
         task_num = data[start]
         descriptor_length = task_num // 2 + task_num % 2
         payload_start = start + 1 + descriptor_length
@@ -113,7 +112,6 @@ class BaseProtocolParser:
         self._buffer += data
         self.total_chars += len(data)
 
-        res = []
         searchpos = 0
 
         while searchpos < len(self._buffer):
@@ -139,7 +137,7 @@ class BaseProtocolParser:
                 break
             crc = sum(b for b in candidate[3:-1]) & 0xff
             if crc == candidate[-1]:
-                res.append(candidate)
+                yield candidate
                 self.message_chars += len(candidate)
                 searchpos += (pos - searchpos) + length
             else:
@@ -148,8 +146,6 @@ class BaseProtocolParser:
 
         if searchpos != -1:
             self._buffer = self._buffer[searchpos:]
-
-        return res
 
     def __len__(self):
         return len(self._buffer)

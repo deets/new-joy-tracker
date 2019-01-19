@@ -15,12 +15,28 @@ BOOT_PIN = 0
 
 DEBUG_MODE = False
 
+SPOKE_SUCCESSFUL_RECEIVE_TIMESTAMP = {}
+SPOKE_MAX_TS_DELTAS = {}
+
 
 def hub_work_in_c(spoke):
     try:
         message = newjoy.nrf24_hub_to_spoke(get_pipe_id(spoke))
         if not DEBUG_MODE:
             sys.stdout.write(message)
+            now = utime.ticks_ms()
+            if spoke in SPOKE_SUCCESSFUL_RECEIVE_TIMESTAMP:
+                delta = utime.ticks_diff(
+                    now,
+                    SPOKE_SUCCESSFUL_RECEIVE_TIMESTAMP[spoke],
+                )
+                SPOKE_MAX_TS_DELTAS[spoke] = max(
+                    delta,
+                    SPOKE_MAX_TS_DELTAS.get(spoke, 0),
+                )
+            SPOKE_SUCCESSFUL_RECEIVE_TIMESTAMP[spoke] = now
+        else:
+            print(repr(message))
     except OSError as e:
         if DEBUG_MODE:
             print(spoke, e)
@@ -29,8 +45,9 @@ def hub_work_in_c(spoke):
 
 
 def toggle_debug(pin):
-    global DEBUG_MODE
+    global DEBUG_MODE, SPOKE_MAX_TS_DELTAS
     DEBUG_MODE = not DEBUG_MODE
+    SPOKE_MAX_TS_DELTAS = {}
 
 
 def setup_debug_toggle():
@@ -53,6 +70,7 @@ def hub(spokes):
             if DEBUG_MODE:
                 print(i, spoke)
                 print(newjoy.nrf24_error_info())
+                print(SPOKE_MAX_TS_DELTAS)
                 utime.sleep_ms(500)
             # # in this special case, we need to
             # # sleep because the receiver is switching
