@@ -53,6 +53,7 @@ def hub(spokes):
             if DEBUG_MODE:
                 print(i, spoke)
                 print(newjoy.nrf24_error_info())
+                utime.sleep_ms(500)
             # # in this special case, we need to
             # # sleep because the receiver is switching
             # # back
