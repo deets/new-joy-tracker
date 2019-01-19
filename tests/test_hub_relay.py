@@ -4,7 +4,7 @@ import logging
 import unittest
 import pathlib
 
-from newjoy.hub_relay import BaseProtocolParser, PackageParser
+from newjoy.hub_relay.parser import BaseProtocolParser, PackageParser
 
 logger = logging.getLogger(__name__)
 
@@ -52,18 +52,24 @@ class ParserTests(unittest.TestCase):
     def test_package_parsing(self):
         package = b'#m\x92IRIS\x00\x00S\x05\x11"\x01PP]\x89\x7f?\xdfxH\xbb\x1f\xe9\xb39\xa3h{<\x00\x00X\xbb\x00\x00\x14\xbc\x00\x10\x81?\xc2\x83\x7f?\xdc`\x97:\xa8\xef\xe9\xba\xb5\x13\xa6\xbc\x00\x00`;\x00\x00\x08;\x00\xd8\x7f?;J\x00\x00\'Q\x00\x00\x93&\x7f?\x1c\xb9\xf8\xb9|p\xa49\x1e\x91i=\x00\x00\xac\xbb\x00\x00\x00\x00\x00X\x82?\x8c'
         package_parser = PackageParser()
-        name, descriptor, imu, packet_diff = package_parser.feed(package)
-        # for a, b in zip(
-        #     (0.9983112812042236, 0.0007142809918150306, -0.0003797074896283448, -0.0012578396126627922, 0.0008544921875, 0.0013427734375, 0.9940185546875),
-        #     imu
-        # ):
-        #     self.assertAlmostEqual(a, b, places=4)
-        pass
+        kind, (name, descriptor, imu, packet_diff) = package_parser.feed(package)
 
 
     def test_all_package_parsing(self):
         package_parser = PackageParser()
         parser = BaseProtocolParser()
-        messages = list(parser.feed(DATA))
-        name, descriptor, payload, packet_diff = package_parser.feed(messages[0])
-        print(payload)
+        for message in parser.feed(DATA):
+            message_type, data = \
+                package_parser.feed(message)
+            if message_type == "S":
+                (name, descriptor, payload, packet_diff) = data
+                #print(payload)
+            elif message_type == "H":
+                print(data)
+
+    def test_hub_status_package_parsing(self):
+        data = b'#\x13\xecOTTO\x00\x00HIRIS\x00\x00\x0e\x00\xd3'
+        package_parser = PackageParser()
+        kind, data = package_parser.feed(data)
+        self.assertEqual(kind, "H")
+        print(data)

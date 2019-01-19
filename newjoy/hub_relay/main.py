@@ -62,10 +62,15 @@ def main():
         if count:
             data = p.read(count)
             for message in parser.feed(data):
-                name, descriptor, payload, packet_diff = package_parser.feed(message)
-                stats.feed(name, packet_diff)
-                send_osc_message(client, name, descriptor, payload)
-                send_visualisation_message(vis_client, name, packet_diff)
+                message_type, data = package_parser.feed(message)
+                if message_type == "S":
+                    name, descriptor, payload, packet_diff = data
+                    stats.feed(name, packet_diff)
+                    send_osc_message(client, name, descriptor, payload)
+                    send_visualisation_message(vis_client, name, packet_diff)
+                elif message_type == "H":
+                    logger.info("HUB status data: %r", data)
+                    logger.info("Serial package stats: %s", str(stats))
 
             logger.debug(
                 "messages: {} bytes: {} message-chars: {} lost-chars: {} loss-rate {:2.1f} buffer-length: {}".format(

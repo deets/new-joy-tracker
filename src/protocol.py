@@ -8,6 +8,16 @@ import machine
 from names import MAPPING, get_name
 
 SENSOR_MESSAGE = ord(b'S')
+HUB_STATUS_MESSAGE = ord(b'H')
+
+
+def compute_crc(buffer):
+    crc = 0
+    for b in buffer[3:-1]:
+        crc += b
+        crc &= 0xff
+    buffer[-1] = crc
+
 
 class Protocol:
 
@@ -131,11 +141,7 @@ class Protocol:
 
     def update(self):
         newjoy.sync()
-        crc = 0
-        for b in self.buffer[3:-1]:
-            crc += b
-        crc &= 0xff
-        self.buffer[-1] = crc
+        compute_crc(self.buffer)
         # print(self.buffer)
         return bytearray(self.buffer)
 
@@ -146,3 +152,28 @@ class Protocol:
             self._osc_payload_start,
         )
         osc.send(self._osc_path, *((self._osc_descriptor,) + args))
+
+
+def assemble_hub_status_message(max_deltas, buffer=None):
+    # header, length, name, type,
+    total_length = 1 + 2 + 6 + 1 + ((4 + 4) * len(max_deltas)) + 1
+    print("total_length", total_length)
+    if buffer is None or len(buffer) != total_length:
+        buffer = bytearray(total_length)
+    buffer[0] = ord(b'#')
+    buffer[1] = total_length
+    buffer[2] = 0xff ^ total_length
+    offset = 3
+    name = bytearray(get_name()) + b"\0\0"
+    buffer[offset:offset + len(name)] = name
+    offset += len(name)
+    buffer[offset] = HUB_STATUS_MESSAGE
+    offset += 1
+    for spoke_name, max_delta in max_deltas.items():
+        buffer[offset:offset+4] = bytearray(spoke_name)
+        offset += 4
+        buffer[offset:offset+4] = ustruct.pack('I', max_delta)
+        offset += 4
+
+    compute_crc(buffer)
+    return buffer

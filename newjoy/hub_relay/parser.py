@@ -29,10 +29,26 @@ class PackageParser:
         self._last_message = {}
 
     def feed(self, package):
-        now = time.monotonic()
         id_ = package[3:3 + 6]
         name = id_[:-2]
+        message_type = package[9]
+        if message_type == ord(b'S'):
+            return self._sensor_message(name, package)
+        else:
+            return self._hub_status_message(package)
 
+    def _hub_status_message(self, package):
+        payload = package[10:-1]
+        res = {}
+        for i in range(len(payload) // 8):
+            offset = i * 8
+            res[payload[offset:offset + 4]] = struct.unpack(
+                "I", payload[offset + 4: offset + 8]
+                )[0] / 1000.0 # this is in ms, we want seconds
+        return "H", res
+
+    def _sensor_message(self, name, package):
+        now = time.monotonic()
         if name not in self._parsers:
             self._parsers[name], self._descriptors[name] = self._setup_parser(
                 package,
@@ -42,7 +58,7 @@ class PackageParser:
 
         packet_diff = now - self._last_message[name]
         self._last_message[name] = now
-        return (
+        return "S", (
             name,
             self._descriptors[name],
             self._parsers[name](package),
@@ -122,6 +138,7 @@ class BaseProtocolParser:
             # and thus stop processing
             if len(candidate) != length:
                 break
+
             crc = sum(b for b in candidate[3:-1]) & 0xff
             if crc == candidate[-1]:
                 yield candidate

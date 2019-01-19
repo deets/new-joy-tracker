@@ -8,6 +8,7 @@ import machine
 import newjoy
 from misc import cycle
 from names import get_pipe_id
+from protocol import assemble_hub_status_message
 
 
 TX_SWITCH_DELAY_US = 150
@@ -60,17 +61,24 @@ def setup_debug_toggle():
 
 
 def hub(spokes):
+    global SPOKE_MAX_TS_DELTAS
     setup_debug_toggle()
     newjoy.nrf24_teardown()
     # we transmit using our ID
     newjoy.nrf24_setup(get_pipe_id())
     failures = 0
+    status_buffer = None
     for i in cycle():
         for spoke in spokes:
             if DEBUG_MODE:
                 print(i, spoke)
                 print(newjoy.nrf24_error_info())
                 print(SPOKE_MAX_TS_DELTAS)
+                status_buffer = assemble_hub_status_message(
+                    SPOKE_MAX_TS_DELTAS,
+                    status_buffer,
+                )
+                sys.stdout.write(repr(status_buffer))
                 utime.sleep_ms(500)
             # # in this special case, we need to
             # # sleep because the receiver is switching
@@ -78,6 +86,17 @@ def hub(spokes):
             if len(spokes) == 1:
                 utime.sleep_us(TX_SWITCH_DELAY_US)
             failures += hub_work_in_c(spoke)
+
+        if i % 1000 == 0 and not DEBUG_MODE:
+            status_buffer = assemble_hub_status_message(
+                SPOKE_MAX_TS_DELTAS,
+                status_buffer,
+            )
+            sys.stdout.write(status_buffer)
+            # empty these, as otherwise our own
+            # gathering and sending would unduly influence
+            # this metric
+            SPOKE_MAX_TS_DELTAS = {}
 
 
 def spoke_setup():
