@@ -77,10 +77,12 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
         ESP_LOGI(SPP_TAG, "ESP_SPP_CL_INIT_EVT");
         break;
     case ESP_SPP_DATA_IND_EVT:
+      fwrite(param->data_ind.data, 1, param->data_ind.len, stdout);
+
 #if (SPP_SHOW_MODE == SPP_SHOW_DATA)
         ESP_LOGI(SPP_TAG, "ESP_SPP_DATA_IND_EVT len=%d handle=%d",
                  param->data_ind.len, param->data_ind.handle);
-        //esp_log_buffer_hex("",param->data_ind.data,param->data_ind.len);
+        //esp_log_buffer_hex("", param->data_ind.data,param->data_ind.len);
 #else
         gettimeofday(&time_new, NULL);
         data_num += param->data_ind.len;
