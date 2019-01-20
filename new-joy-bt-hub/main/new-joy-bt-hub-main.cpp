@@ -26,10 +26,10 @@
 
 #define SPP_TAG "NJ-BT-HUB"
 #define SPP_SERVER_NAME "SPP_SERVER"
-#define EXCAMPLE_DEVICE_NAME "NJ-TIMO"
+#define EXCAMPLE_DEVICE_NAME "ESP_SPP_ACCEPTOR"
 #define SPP_SHOW_DATA 0
 #define SPP_SHOW_SPEED 1
-#define SPP_SHOW_MODE SPP_SHOW_SPEED    /*Choose show mode: show data or speed*/
+#define SPP_SHOW_MODE SPP_SHOW_DATA    /*Choose show mode: show data or speed*/
 
 static const esp_spp_mode_t esp_spp_mode = ESP_SPP_MODE_CB;
 
@@ -80,7 +80,7 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
 #if (SPP_SHOW_MODE == SPP_SHOW_DATA)
         ESP_LOGI(SPP_TAG, "ESP_SPP_DATA_IND_EVT len=%d handle=%d",
                  param->data_ind.len, param->data_ind.handle);
-        esp_log_buffer_hex("",param->data_ind.data,param->data_ind.len);
+        //esp_log_buffer_hex("",param->data_ind.data,param->data_ind.len);
 #else
         gettimeofday(&time_new, NULL);
         data_num += param->data_ind.len;
@@ -141,6 +141,10 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
     return;
 }
 
+
+extern "C" {
+   void app_main(void);
+}
 
 void app_main()
 {
