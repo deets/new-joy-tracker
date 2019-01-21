@@ -116,6 +116,7 @@ def main():
     reconnect_count = 0
 
     osc = Client(destination_address, OSC_PORT)
+    print("sending OSC to", destination_address, OSC_PORT)
 
     while True:
         print("connecting...")
@@ -127,6 +128,7 @@ def main():
                 # s.sendto(protocol.buffer, (destination_address, PORT))
                 time.sleep_ms(LOOP_SLEEP_MS)
                 machine.idle()
+                #print(".", end="")
         except OSError:
             reconnect_count += 1
             if reconnect_count > RESET_COUNT:
