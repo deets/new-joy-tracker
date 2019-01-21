@@ -5,7 +5,7 @@ import machine
 import time
 import socket
 import mpu6050
-import bme280
+import debugpin
 from uosc.client import Client
 
 
@@ -117,7 +117,7 @@ def main():
 
     osc = Client(destination_address, OSC_PORT)
     print("sending OSC to", destination_address, OSC_PORT)
-
+    debugpin.setup()
     while True:
         print("connecting...")
         try:
@@ -128,7 +128,8 @@ def main():
                 # s.sendto(protocol.buffer, (destination_address, PORT))
                 time.sleep_ms(LOOP_SLEEP_MS)
                 machine.idle()
-                #print(".", end="")
+                if debugpin.DEBUG_MODE:
+                    print(".", end="")
         except OSError:
             reconnect_count += 1
             if reconnect_count > RESET_COUNT:
