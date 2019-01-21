@@ -109,6 +109,7 @@ class Protocol:
             descriptor[offset] = current
             newjoy.add_task(bus, address, task, task_byte_offset)
             task_byte_offset += task_size
+            osc_payload_start += task_size
 
         osc_descriptor = ""
         for busno, devices in sorted(self._osc_descriptor.items()):
@@ -126,4 +127,5 @@ class Protocol:
                 self.buffer,
                 osc_payload_start,
             )
+            print(i, args)
             osc.send(self._osc_path, i, *args)
