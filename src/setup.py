@@ -51,7 +51,7 @@ OSC_PORT = 10000
 CONNECT_TIMEOUT = 100
 RESET_COUNT = 10  # after these, we try to reset the board for reconnection
 LOOP_SLEEP_MS = 70
-SENSOR_PERIOD = 2  # in milliseconds
+SENSOR_PERIOD = 5  # in milliseconds
 I2C_FREQUENCY = 1000_000
 
 
@@ -95,10 +95,12 @@ def setup_all():
 
 
 CONNECT_TO_NET = True
+SETUP_DEBUG_PIN = False
 
 
 def main():
-    debugpin.setup()
+    if SETUP_DEBUG_PIN:
+        debugpin.setup()
     name = get_name()
     print(name)
     protocol = setup_all()
