@@ -127,5 +127,4 @@ class Protocol:
                 self.buffer,
                 osc_payload_start,
             )
-            print(i, args)
             osc.send(self._osc_path, i, *args)

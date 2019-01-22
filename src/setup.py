@@ -7,12 +7,9 @@ import socket
 import mpu6050
 import debugpin
 from uosc.client import Client
-
-
 from protocol import Protocol
 from wifi import setup_wifi
 from names import get_name
-from nrf24protocol import hub, spoke
 
 # I2C 1 is missing due to some
 # system setup issue when the lines
@@ -97,34 +94,38 @@ def setup_all():
     return protocol
 
 
+CONNECT_TO_NET = True
+
+
 def main():
+    debugpin.setup()
     name = get_name()
     print(name)
     protocol = setup_all()
-    if name == "OTTO":
-        hub(["IRIS"])
-    elif name == "IRIS":
-        spoke("OTTO")
-
-    while True:
-        try:
-            nic, destination_address = setup_wifi()
-            break
-        except Exception:
-            pass
 
     reconnect_count = 0
+    osc_client = None
+    nic, destination_address = None, None
 
-    osc = Client(destination_address, OSC_PORT)
-    print("sending OSC to", destination_address, OSC_PORT)
-    debugpin.setup()
+    if CONNECT_TO_NET:
+        while True:
+            try:
+                nic, destination_address = setup_wifi()
+                break
+            except Exception:
+                pass
+
+        osc = Client(destination_address, OSC_PORT)
+        print("sending OSC to", destination_address, OSC_PORT)
+
     while True:
         print("connecting...")
         try:
             # s = setup_socket(nic)
             while True:
                 protocol.update()
-                protocol.send_osc(osc)
+                if CONNECT_TO_NET:
+                    protocol.send_osc(osc)
                 # s.sendto(protocol.buffer, (destination_address, PORT))
                 time.sleep_ms(LOOP_SLEEP_MS)
                 machine.idle()
