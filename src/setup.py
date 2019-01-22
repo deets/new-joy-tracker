@@ -117,18 +117,19 @@ def main():
             except Exception:
                 pass
 
-        osc = Client(destination_address, OSC_PORT)
+        osc_client = Client(destination_address, OSC_PORT)
         print("sending OSC to", destination_address, OSC_PORT)
 
+    # we have a spurious boot pin trigger,
+    # I force debug off once here
+    debugpin.DEBUG_MODE = False
     while True:
         print("connecting...")
         try:
             # s = setup_socket(nic)
             while True:
                 protocol.update()
-                if CONNECT_TO_NET:
-                    protocol.send_osc(osc)
-                # s.sendto(protocol.buffer, (destination_address, PORT))
+                protocol.send_osc(osc_client)
                 time.sleep_ms(LOOP_SLEEP_MS)
                 machine.idle()
                 if debugpin.DEBUG_MODE:

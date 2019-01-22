@@ -6,14 +6,9 @@ DEBUG_MODE = False
 
 
 def toggle_debug(pin):
-    global DEBUG_MODE, SPOKE_MAX_TS_DELTAS
+    global DEBUG_MODE
     DEBUG_MODE = not DEBUG_MODE
-    SPOKE_MAX_TS_DELTAS = {}
     print("max_task_time", newjoy.max_task_time())
-    # print()
-    # for i in range(newjoy.task_count()):
-    #     print(i, newjoy.task_info(i))
-    # print()
 
 
 def setup():

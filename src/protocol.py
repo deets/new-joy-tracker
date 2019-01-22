@@ -3,8 +3,9 @@
 import ustruct
 import newjoy
 import machine
-
+import debugpin
 from names import MAPPING
+
 
 class Protocol:
 
@@ -127,4 +128,11 @@ class Protocol:
                 self.buffer,
                 osc_payload_start,
             )
-            osc.send(self._osc_path, i, *args)
+            # this is butt-ugly, but the setup.CONNECT_TO_NET
+            # controls if osc is None or not. And with this
+            # hack the debugpin prints something even if there
+            # is no network
+            if osc is not None:
+                osc.send(self._osc_path, i, *args)
+            if debugpin.DEBUG_MODE:
+                print(i, args)
