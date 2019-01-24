@@ -8,6 +8,7 @@ for p in [
     sys.path.append(p)
 
 
+from functools import partial
 
 from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph as pg
@@ -65,11 +66,9 @@ class QuaternionInvestigator(QtCore.QObject):
         super().__init__()
         self._rot = 0.0
 
-        self._w = w = gl.GLViewWidget()
-        w.show()
-        w.setWindowTitle('pyqtgraph example: GLMeshItem')
+        self.widget = w = gl.GLViewWidget()
         w.setCameraPosition(distance=40)
-
+        w.show()
         g = gl.GLGridItem()
         g.scale(2, 2, 1)
         w.addItem(g)
@@ -86,13 +85,55 @@ class QuaternionInvestigator(QtCore.QObject):
             qrep.rotate(self._rot)
 
     def add_quaternion_rep(self, key):
-        self._quaternion_reps[key] = QuaternionRep(self._w)
+        self._quaternion_reps[key] = QuaternionRep(self.widget)
+
+
+def save_window_settings(*windows):
+    settings = QtCore.QSettings("deets_design", "quaternion-investigator")
+    for i, window in enumerate(windows):
+        settings.setValue("geometry-{}".format(i), window.saveGeometry())
+        settings.setValue("windowState-{}".format(i), window.saveState())
+
+
+def load_window_settings(*windows):
+    settings = QtCore.QSettings("deets_design", "quaternion-investigator")
+    for i, window in enumerate(windows):
+        saved_geometry = settings.value("geometry-{}".format(i))
+        if saved_geometry is not None:
+            window.restoreGeometry(saved_geometry)
+        saved_state = settings.value("windowState-{}".format(i))
+        if saved_state is not None:
+            window.restoreState(saved_state)
 
 
 def main():
     app = QtGui.QApplication([])
+
+    mw = QtGui.QMainWindow()
+    mw.setWindowTitle('Quaternion Investigator')
+    cw = QtGui.QWidget()
+    mw.setCentralWidget(cw)
+    layout = QtGui.QVBoxLayout()
+    cw.setLayout(layout)
+
+    pw = pg.PlotWidget(name='Plot1')  ## giving the plots names allows us to link their axes together
     qi = QuaternionInvestigator()
+
+    layout.addWidget(pw)
+    pw2 = pg.PlotWidget(name='Plot1')
+    layout.addWidget(pw2)
+    mw.show()
+
     qi.add_quaternion_rep(0)
+
+    mw2 = QtGui.QMainWindow()
+    mw2.setCentralWidget(qi.widget)
+    mw2.show()
+    load_window_settings(mw, mw2)
+    app.aboutToQuit.connect(partial(save_window_settings, mw, mw2))
+    for w in [mw, mw2]:
+        w.raise_()
+
     app.exec_()
 
 
