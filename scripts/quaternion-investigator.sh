@@ -14,7 +14,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 import numpy as np
-
+import PyQt5.QtWidgets as QtWidgets
 
 def debug_trace():
   from pdb import set_trace
@@ -62,6 +62,7 @@ class QuaternionRep(QtCore.QObject):
 class QuaternionInvestigator(QtCore.QObject):
 
     angle = QtCore.pyqtSignal(float, name='angle')
+    quaternion_rep_added = QtCore.pyqtSignal(int, name="quaternion_rep_added")
 
     def __init__(self):
         super().__init__()
@@ -88,6 +89,7 @@ class QuaternionInvestigator(QtCore.QObject):
 
     def add_quaternion_rep(self, key):
         self._quaternion_reps[key] = QuaternionRep(self.widget)
+        self.quaternion_rep_added.emit(key)
 
 
 def save_window_settings(*windows):
@@ -125,6 +127,41 @@ class AnglePlot(QtCore.QObject):
         self._curve.setData(self._data)
 
 
+class SourceSelection(QtCore.QAbstractListModel):
+
+    def __init__(self):
+        super().__init__()
+        self._data = [
+        ]
+
+        w = self.widget = QtGui.QWidget()
+        layout = QtGui.QHBoxLayout()
+        w.setLayout(layout)
+
+        self._source_a = QtWidgets.QComboBox()
+        self._source_b = QtWidgets.QComboBox()
+        self._source_a.setModel(self)
+        self._source_b.setModel(self)
+        layout.addWidget(self._source_a)
+        layout.addWidget(self._source_b)
+
+    def data(self, index, role):
+        if index.row() < len(self._data):
+            return self._data[index.row()]
+        return QtCore.QVariant()
+
+    def rowCount(self, _parent):
+        return len(self._data)
+
+    def add_source(self, source):
+        self.beginInsertRows(
+            QtCore.QModelIndex(),
+            len(self._data), len(self._data)
+        )
+        self._data.append(source)
+        self.endInsertRows()
+
+
 def main():
     app = QtGui.QApplication([])
 
@@ -137,11 +174,17 @@ def main():
 
     angle_plot = AnglePlot()
     qi = QuaternionInvestigator()
+    source_selection = SourceSelection()
 
+    qi.quaternion_rep_added.connect(source_selection.add_source)
+    qi.angle.connect(angle_plot.update_data)
+
+    layout.addWidget(source_selection.widget)
     layout.addWidget(angle_plot.widget)
     mw.show()
 
     qi.add_quaternion_rep(0)
+    qi.add_quaternion_rep(1)
 
     mw2 = QtGui.QMainWindow()
     mw2.setCentralWidget(qi.widget)
@@ -151,7 +194,6 @@ def main():
     for w in [mw, mw2]:
         w.raise_()
 
-    qi.angle.connect(angle_plot.update_data)
     app.exec_()
 
 
