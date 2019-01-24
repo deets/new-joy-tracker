@@ -59,12 +59,13 @@ class QuaternionRep(QtCore.QObject):
         c.transform().translate(0, 0, -self.LENGTH / 2)
 
 
-
 class QuaternionInvestigator(QtCore.QObject):
+
+    angle = QtCore.pyqtSignal(float, name='angle')
 
     def __init__(self):
         super().__init__()
-        self._rot = 0.0
+        self._angle = 0.0
 
         self.widget = w = gl.GLViewWidget()
         w.setCameraPosition(distance=40)
@@ -80,9 +81,10 @@ class QuaternionInvestigator(QtCore.QObject):
         self._timer.start(10)
 
     def _update(self):
-        self._rot += 1  # degrees
+        self._angle += 1  # degrees
         for qrep in self._quaternion_reps.values():
-            qrep.rotate(self._rot)
+            qrep.rotate(self._angle)
+        self.angle.emit(self._angle)
 
     def add_quaternion_rep(self, key):
         self._quaternion_reps[key] = QuaternionRep(self.widget)
@@ -106,6 +108,23 @@ def load_window_settings(*windows):
             window.restoreState(saved_state)
 
 
+class AnglePlot(QtCore.QObject):
+
+    PEN_COLOR = (255, 0, 0)
+
+    def __init__(self):
+        super().__init__()
+        self.widget = pg.PlotWidget(name='Angle Plot')
+        self._curve = self.widget.plot()
+        self._curve.setPen(self.PEN_COLOR)
+        self._data = []
+        self._curve.setData(self._data)
+
+    def update_data(self, angle):
+        self._data.append(angle)
+        self._curve.setData(self._data)
+
+
 def main():
     app = QtGui.QApplication([])
 
@@ -116,12 +135,10 @@ def main():
     layout = QtGui.QVBoxLayout()
     cw.setLayout(layout)
 
-    pw = pg.PlotWidget(name='Plot1')  ## giving the plots names allows us to link their axes together
+    angle_plot = AnglePlot()
     qi = QuaternionInvestigator()
 
-    layout.addWidget(pw)
-    pw2 = pg.PlotWidget(name='Plot1')
-    layout.addWidget(pw2)
+    layout.addWidget(angle_plot.widget)
     mw.show()
 
     qi.add_quaternion_rep(0)
@@ -134,6 +151,7 @@ def main():
     for w in [mw, mw2]:
         w.raise_()
 
+    qi.angle.connect(angle_plot.update_data)
     app.exec_()
 
 
