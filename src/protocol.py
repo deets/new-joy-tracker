@@ -2,6 +2,7 @@
 # Copyright: 2018, Diez B. Roggisch, Berlin . All rights reserved.
 import ustruct
 import newjoy
+import utime
 import machine
 import debugpin
 from names import MAPPING
@@ -133,6 +134,6 @@ class Protocol:
             # hack the debugpin prints something even if there
             # is no network
             if osc is not None:
-                osc.send(self._osc_path, i, *args)
+                osc.send(self._osc_path, i, utime.ticks_ms(), *args)
             if debugpin.DEBUG_MODE:
                 print(i, args)
