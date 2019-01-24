@@ -8,10 +8,17 @@ for p in [
     sys.path.append(p)
 
 
+
 from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 import numpy as np
+
+
+def debug_trace():
+  from pdb import set_trace
+  QtCore.pyqtRemoveInputHook()
+  set_trace()
 
 
 class QuaternionRep(QtCore.QObject):
@@ -44,8 +51,12 @@ class QuaternionRep(QtCore.QObject):
     def rotate(self, angle):
         c = self._cylinder
         c.resetTransform()
-        c.translate(0, 0, -self.LENGTH / 2)
-        c.rotate(angle, 0, 1, 0)
+        self.quat = QtGui.QQuaternion.fromAxisAndAngle(
+            0, 1, 0, angle,
+        )
+        c.transform().rotate(self.quat)
+        c.transform().translate(0, 0, -self.LENGTH / 2)
+
 
 
 class QuaternionInvestigator(QtCore.QObject):
