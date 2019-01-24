@@ -14,6 +14,40 @@ import pyqtgraph.opengl as gl
 import numpy as np
 
 
+class QuaternionRep(QtCore.QObject):
+    LENGTH = 3
+
+    def __init__(self, w):
+        super().__init__()
+
+        self.quat = QtGui.QQuaternion()
+
+        md = gl.MeshData.cylinder(
+            rows=10,
+            cols=20,
+            radius=[.5, .5],
+            length=self.LENGTH
+        )
+        colors = np.ones((md.faceCount(), 4), dtype=float)
+        colors[::2, 0] = 0
+        colors[:, 1] = np.linspace(0, 1, colors.shape[0])
+        md.setFaceColors(colors)
+        self._cylinder = gl.GLMeshItem(
+            meshdata=md,
+            smooth=True,
+            drawEdges=True,
+            edgeColor=(1, 0, 0, 1),
+            shader='balloon',
+        )
+        w.addItem(self._cylinder)
+
+    def rotate(self, angle):
+        c = self._cylinder
+        c.resetTransform()
+        c.translate(0, 0, -self.LENGTH / 2)
+        c.rotate(angle, 0, 1, 0)
+
+
 class QuaternionInvestigator(QtCore.QObject):
 
     def __init__(self):
@@ -38,29 +72,10 @@ class QuaternionInvestigator(QtCore.QObject):
     def _update(self):
         self._rot += 1  # degrees
         for qrep in self._quaternion_reps.values():
-            qrep.resetTransform()
-            qrep.rotate(self._rot, 0, 1, 0)
+            qrep.rotate(self._rot)
 
     def add_quaternion_rep(self, key):
-        md = gl.MeshData.cylinder(
-            rows=10,
-            cols=20,
-            radius=[.5, .5],
-            length=3.
-        )
-        colors = np.ones((md.faceCount(), 4), dtype=float)
-        colors[::2, 0] = 0
-        colors[:, 1] = np.linspace(0, 1, colors.shape[0])
-        md.setFaceColors(colors)
-        cylinder = gl.GLMeshItem(
-            meshdata=md,
-            smooth=True,
-            drawEdges=True,
-            edgeColor=(1, 0, 0, 1),
-            shader='balloon',
-        )
-        self._w.addItem(cylinder)
-        self._quaternion_reps[key] = cylinder
+        self._quaternion_reps[key] = QuaternionRep(self._w)
 
 
 def main():
