@@ -7,6 +7,7 @@ for p in [
         ]:
     sys.path.append(p)
 
+import math
 from functools import partial
 
 from pyqtgraph.Qt import QtCore, QtGui
@@ -93,6 +94,8 @@ class QuaternionInvestigator(QtCore.QObject):
 
     angle = QtCore.pyqtSignal(float, name='angle')
     quaternion_rep_added = QtCore.pyqtSignal(int, name="quaternion_rep_added")
+    quaternion = QtCore.pyqtSignal(int, QtGui.QQuaternion, name="quaternion")
+
 
     def __init__(self, destination="", port=10000):
         super().__init__()
@@ -117,9 +120,9 @@ class QuaternionInvestigator(QtCore.QObject):
         path, sensor_no, uptime, q1, q2, q3, q4, *_ = message
         if sensor_no not in self._quaternion_reps:
             self.add_quaternion_rep(sensor_no)
-        self._quaternion_reps[sensor_no].update(
-            QtGui.QQuaternion(q1, q2, q3, q4)
-        )
+        quat = QtGui.QQuaternion(q1, q2, q3, q4)
+        self._quaternion_reps[sensor_no].update(quat)
+        self.quaternion.emit(sensor_no, quat)
 
     def add_quaternion_rep(self, key):
         self._quaternion_reps[key] = QuaternionRep(self.widget)
@@ -144,6 +147,17 @@ def load_window_settings(*windows):
             window.restoreState(saved_state)
 
 
+def angle_between_quats(qa, qb):
+    vec = QtGui.QVector3D(1, 0, 0)
+    va = qa.rotatedVector(vec)
+    vb = qb.rotatedVector(vec)
+    vector_cos = va.dotProduct(va, vb)
+    try:
+        return math.acos(vector_cos) / math.pi * 180
+    except ValueError:
+        debug_trace()
+
+
 class AnglePlot(QtCore.QObject):
 
     PEN_COLOR = (255, 0, 0)
@@ -155,13 +169,29 @@ class AnglePlot(QtCore.QObject):
         self._curve.setPen(self.PEN_COLOR)
         self._data = []
         self._curve.setData(self._data)
+        self._a, self._b = None, None
+        self._quaternions = {}
 
-    def update_data(self, angle):
-        self._data.append(angle)
-        self._curve.setData(self._data)
+    def update(self, sensor_no, quaternion):
+        self._quaternions[sensor_no] = quaternion
+        quat_a = self._quaternions.get(self._a)
+        quat_b = self._quaternions.get(self._b)
+        if quat_a is not None and quat_b is not None:
+            self._data.append(angle_between_quats(quat_a, quat_b))
+            self._curve.setData(self._data)
+
+    def update_indices(self, a, b):
+        old = self._a, self._b
+        self._a = a
+        self._b = b
+        if old != (a, b):
+            self._data = []
+            self._curve.setData(self._data)
 
 
 class SourceSelection(QtCore.QAbstractListModel):
+
+    indices = QtCore.pyqtSignal(int, int, name="indices")
 
     def __init__(self):
         super().__init__()
@@ -176,8 +206,17 @@ class SourceSelection(QtCore.QAbstractListModel):
         self._source_b = QtWidgets.QComboBox()
         self._source_a.setModel(self)
         self._source_b.setModel(self)
+        self._source_a.currentIndexChanged.connect(self._index_changed)
+        self._source_b.currentIndexChanged.connect(self._index_changed)
+
         layout.addWidget(self._source_a)
         layout.addWidget(self._source_b)
+
+    def _index_changed(self, _index):
+        self.indices.emit(
+            self._source_a.currentData(),
+            self._source_b.currentData(),
+        )
 
     def data(self, index, role):
         if index.row() < len(self._data):
@@ -209,9 +248,10 @@ def main():
     angle_plot = AnglePlot()
     qi = QuaternionInvestigator()
     source_selection = SourceSelection()
+    source_selection.indices.connect(angle_plot.update_indices)
 
     qi.quaternion_rep_added.connect(source_selection.add_source)
-    qi.angle.connect(angle_plot.update_data)
+    qi.quaternion.connect(angle_plot.update)
 
     layout.addWidget(source_selection.widget)
     layout.addWidget(angle_plot.widget)
