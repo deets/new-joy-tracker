@@ -5,6 +5,7 @@ import network
 
 KNOWN_NETWORKS = None
 
+
 def load_known_networks():
     global KNOWN_NETWORKS
     if KNOWN_NETWORKS is None:
@@ -21,13 +22,11 @@ def load_known_networks():
 def setup_wifi():
     nic = network.WLAN(network.STA_IF)
     nic.active(True)
-    networks = nic.scan()
-    for name, *_ in networks:
-        for ssid, password, destination_address in KNOWN_NETWORKS:
-            if ssid == name:
-                nic.connect(name, password)
-                print("Connected to {}".format(name.decode("ascii")))
-                return nic, destination_address
+    for ssid, password, destination_address in KNOWN_NETWORKS:
+        nic.connect(ssid, password)
+        print("Connected to {}".format(ssid))
+        return nic, destination_address
     raise Exception("Couldn't connect to WIFI network!")
+
 
 load_known_networks()
