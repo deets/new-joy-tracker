@@ -7,7 +7,6 @@ for p in [
         ]:
     sys.path.append(p)
 
-import threading
 from functools import partial
 
 from pyqtgraph.Qt import QtCore, QtGui
@@ -32,8 +31,6 @@ class QuaternionRep(QtCore.QObject):
     def __init__(self, w):
         super().__init__()
 
-        self.quat = QtGui.QQuaternion()
-
         md = gl.MeshData.cylinder(
             rows=10,
             cols=20,
@@ -53,14 +50,43 @@ class QuaternionRep(QtCore.QObject):
         )
         w.addItem(self._cylinder)
 
-    def rotate(self, angle):
+    def update(self, quat):
         c = self._cylinder
         c.resetTransform()
-        self.quat = QtGui.QQuaternion.fromAxisAndAngle(
-            0, 1, 0, angle,
-        )
-        c.transform().rotate(self.quat)
+        c.transform().rotate(quat)
         c.transform().translate(0, 0, -self.LENGTH / 2)
+
+
+class OSCWorker(QtCore.QObject):
+
+    message = QtCore.pyqtSignal(list, name='message')
+
+    def __init__(self, destination, port):
+        super().__init__()
+        self._destination, self._port = destination, port
+        self._running = True
+        self._server_thread = QtCore.QThread()
+        self.moveToThread(self._server_thread)
+        self._server_thread.started.connect(self._work)
+        self._server_thread.start()
+
+    def _work(self):
+        disp = dispatcher.Dispatcher()
+        disp.map("/*", self._got_osc)
+        server = osc_server.BlockingOSCUDPServer(
+            (self._destination, self._port),
+            disp,
+        )
+        while self._running:
+            server.handle_request()
+        self._server_thread.exit()
+
+    def _got_osc(self, path, *args):
+        self.message.emit([path] + list(args))
+
+    def quit(self):
+        self._running = False
+        self._server_thread.wait()
 
 
 class QuaternionInvestigator(QtCore.QObject):
@@ -81,25 +107,19 @@ class QuaternionInvestigator(QtCore.QObject):
 
         self._quaternion_reps = {}
 
-        self._timer = QtCore.QTimer()
-        self._timer.timeout.connect(self._update)
-        self._timer.start(10)
+        self._osc_worker = OSCWorker(destination, port)
+        self._osc_worker.message.connect(self._got_osc)
 
-        disp = dispatcher.Dispatcher()
-        disp.map("/*", self._got_osc)
-        server = osc_server.BlockingOSCUDPServer((destination, port), disp)
-        self._server_thread = threading.Thread(target=server.serve_forever)
-        self._server_thread.start()
+    def about_to_quit(self):
+        self._osc_worker.quit()
 
-    def _got_osc(self, path, *args):
-        print(path, args)
-
-
-    def _update(self):
-        self._angle += 1  # degrees
-        for qrep in self._quaternion_reps.values():
-            qrep.rotate(self._angle)
-        self.angle.emit(self._angle)
+    def _got_osc(self, message):
+        path, sensor_no, uptime, q1, q2, q3, q4, *_ = message
+        if sensor_no not in self._quaternion_reps:
+            self.add_quaternion_rep(sensor_no)
+        self._quaternion_reps[sensor_no].update(
+            QtGui.QQuaternion(q1, q2, q3, q4)
+        )
 
     def add_quaternion_rep(self, key):
         self._quaternion_reps[key] = QuaternionRep(self.widget)
@@ -202,6 +222,7 @@ def main():
     mw2.show()
     load_window_settings(mw, mw2)
     app.aboutToQuit.connect(partial(save_window_settings, mw, mw2))
+    app.aboutToQuit.connect(qi.about_to_quit)
     for w in [mw, mw2]:
         w.raise_()
 
