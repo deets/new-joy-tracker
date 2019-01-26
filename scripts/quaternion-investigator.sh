@@ -7,7 +7,7 @@ for p in [
         ]:
     sys.path.append(p)
 
-
+import threading
 from functools import partial
 
 from pyqtgraph.Qt import QtCore, QtGui
@@ -15,6 +15,10 @@ import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 import numpy as np
 import PyQt5.QtWidgets as QtWidgets
+
+from pythonosc import osc_server
+from pythonosc import dispatcher
+
 
 def debug_trace():
   from pdb import set_trace
@@ -64,7 +68,7 @@ class QuaternionInvestigator(QtCore.QObject):
     angle = QtCore.pyqtSignal(float, name='angle')
     quaternion_rep_added = QtCore.pyqtSignal(int, name="quaternion_rep_added")
 
-    def __init__(self):
+    def __init__(self, destination="", port=10000):
         super().__init__()
         self._angle = 0.0
 
@@ -80,6 +84,16 @@ class QuaternionInvestigator(QtCore.QObject):
         self._timer = QtCore.QTimer()
         self._timer.timeout.connect(self._update)
         self._timer.start(10)
+
+        disp = dispatcher.Dispatcher()
+        disp.map("/*", self._got_osc)
+        server = osc_server.BlockingOSCUDPServer((destination, port), disp)
+        self._server_thread = threading.Thread(target=server.serve_forever)
+        self._server_thread.start()
+
+    def _got_osc(self, path, *args):
+        print(path, args)
+
 
     def _update(self):
         self._angle += 1  # degrees
@@ -182,9 +196,6 @@ def main():
     layout.addWidget(source_selection.widget)
     layout.addWidget(angle_plot.widget)
     mw.show()
-
-    qi.add_quaternion_rep(0)
-    qi.add_quaternion_rep(1)
 
     mw2 = QtGui.QMainWindow()
     mw2.setCentralWidget(qi.widget)
