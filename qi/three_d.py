@@ -8,14 +8,15 @@ class QuaternionRep(QtCore.QObject):
     # y is yellow
     # x is blue
 
-    def __init__(self, w):
+    def __init__(self, w, key):
         super().__init__()
         self._cylinder = gl.GLAxisItem(size=self.SIZE)
         w.addItem(self._cylinder)
+        self._key = key
         self.update(QtGui.QQuaternion())
 
     def update(self, quat):
         c = self._cylinder
         c.resetTransform()
+        c.transform().translate(self._key * 5, 0, 1)
         c.transform().rotate(quat)
-        c.transform().translate(0, 0, 1)

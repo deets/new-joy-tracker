@@ -1,5 +1,6 @@
 #!/Library/Frameworks/Python.framework/Versions/3.7/bin/python3.7
 # -*- mode: python -*-
+import os
 import math
 from functools import partial
 
@@ -9,10 +10,9 @@ import pyqtgraph.opengl as gl
 
 import PyQt5.QtWidgets as QtWidgets
 
-from pythonosc import osc_server
-from pythonosc import dispatcher
-
 from .three_d import QuaternionRep
+from .processor import QuaternionProcessor
+from .osc import OSCWorker, FileOSCWorker
 
 
 def debug_trace():
@@ -39,47 +39,6 @@ def load_window_settings(*windows):
             window.restoreState(saved_state)
 
 
-class OSCWorker(QtCore.QObject):
-
-    message = QtCore.pyqtSignal(list, name="message")
-    new_path = QtCore.pyqtSignal(str, name="new_path")
-
-    def __init__(self, destination, port):
-        super().__init__()
-        self._destination, self._port = destination, port
-        self._running = True
-        self._server_thread = QtCore.QThread()
-        self.moveToThread(self._server_thread)
-        self._server_thread.started.connect(self._work)
-        self._server_thread.start()
-        self._addresses_to_path = {}
-
-    def _work(self):
-        disp = dispatcher.Dispatcher()
-        disp.map("/*", self._got_osc, needs_reply_address=True)
-        server = osc_server.BlockingOSCUDPServer(
-            (self._destination, self._port),
-            disp,
-        )
-        server.timeout = 1
-        while self._running:
-            server.handle_request()
-        self._server_thread.exit()
-
-    def _got_osc(self, address, path, *args):
-        if path not in self._addresses_to_path:
-            self._addresses_to_path[path] = address
-            self.new_path.emit(path)
-        self.message.emit([path] + list(args))
-
-    def quit(self):
-        self._running = False
-        self._server_thread.wait()
-
-    def reset(self, path):
-        print("resetting", path)
-
-
 class QuaternionInvestigator(QtCore.QObject):
 
     quaternion_rep_added = QtCore.pyqtSignal(int, name="quaternion_rep_added")
@@ -87,7 +46,7 @@ class QuaternionInvestigator(QtCore.QObject):
     new_path = QtCore.pyqtSignal(str, name="new_path")
     reset = QtCore.pyqtSignal(str, name="reset")
 
-    def __init__(self, destination="", port=10000):
+    def __init__(self, osc_worker):
         super().__init__()
         self.widget = w = gl.GLViewWidget()
         w.setCameraPosition(distance=40)
@@ -98,7 +57,7 @@ class QuaternionInvestigator(QtCore.QObject):
 
         self._quaternion_reps = {}
 
-        self._osc_worker = OSCWorker(destination, port)
+        self._osc_worker = osc_worker
         self._osc_worker.message.connect(self._got_osc)
         self._osc_worker.new_path.connect(self.new_path)  # just forward
         self.reset.connect(self._osc_worker.reset)  # just forward
@@ -119,7 +78,7 @@ class QuaternionInvestigator(QtCore.QObject):
             self.quaternion.emit(sensor_no, quat)
 
     def add_quaternion_rep(self, key):
-        self._quaternion_reps[key] = QuaternionRep(self.widget)
+        self._quaternion_reps[key] = QuaternionRep(self.widget, key)
         self.quaternion_rep_added.emit(key)
 
 
@@ -237,7 +196,6 @@ class ResetController(QtCore.QObject):
 
 def main():
     app = QtGui.QApplication([])
-
     mw = QtGui.QMainWindow()
     mw.setWindowTitle('Quaternion Investigator')
     cw = QtGui.QWidget()
@@ -246,14 +204,17 @@ def main():
     cw.setLayout(layout)
 
     reset_controller = ResetController()
+    qp = QuaternionProcessor()
 
+    osc_worker = FileOSCWorker(os.path.expanduser("~/osc-shark-export-2"))
     angle_plot = AnglePlot()
-    qi = QuaternionInvestigator()
+    qi = QuaternionInvestigator(osc_worker)
     source_selection = SourceSelection()
     source_selection.indices.connect(angle_plot.update_indices)
 
     qi.quaternion_rep_added.connect(source_selection.add_source)
     qi.quaternion.connect(angle_plot.update)
+    qi.quaternion.connect(qp.update)
     qi.new_path.connect(reset_controller.add_new_path)
     reset_controller.reset.connect(qi.reset)
 
