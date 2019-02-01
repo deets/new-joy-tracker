@@ -95,7 +95,7 @@ def setup_all():
 
 
 CONNECT_TO_NET = True
-SETUP_DEBUG_PIN = False
+SETUP_DEBUG_PIN = True
 
 
 def main():

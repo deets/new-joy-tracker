@@ -8,7 +8,5 @@ for p in [
         os.path.join(os.path.dirname(__file__), ".."),
         ]:
     sys.path.append(p)
-
-
 from qi.main import main
 main()
