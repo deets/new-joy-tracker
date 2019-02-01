@@ -13,14 +13,14 @@ CONVERTERS = {
 }
 
 
-def process_file(filename):
+def process_file(filename, sleep=True, speedup=1):
     with open(filename) as inf:
         last_ts = None
         for line in inf:
             ts, _, path, structure, *values = line.split(",")
             ts = datetime.datetime.strptime(ts, "%d.%m.%Y %H:%M:%S")
-            if last_ts is not None:
-                time.sleep((ts - last_ts).seconds)
+            if sleep and last_ts is not None:
+                time.sleep((ts - last_ts).seconds / speedup)
             last_ts = ts
             yield None, path, \
                   [CONVERTERS[kind](v)

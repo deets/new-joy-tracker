@@ -13,12 +13,7 @@ import PyQt5.QtWidgets as QtWidgets
 from .three_d import QuaternionRep
 from .processor import QuaternionProcessor
 from .osc import OSCWorker, FileOSCWorker
-
-
-def debug_trace():
-  from pdb import set_trace
-  QtCore.pyqtRemoveInputHook()
-  set_trace()
+from .common import angle_between_quats
 
 
 def save_window_settings(*windows):
@@ -80,17 +75,6 @@ class QuaternionInvestigator(QtCore.QObject):
     def add_quaternion_rep(self, key):
         self._quaternion_reps[key] = QuaternionRep(self.widget, key)
         self.quaternion_rep_added.emit(key)
-
-
-def angle_between_quats(qa, qb):
-    vec = QtGui.QVector3D(1, 0, 0)
-    va = qa.rotatedVector(vec)
-    vb = qb.rotatedVector(vec)
-    vector_cos = va.dotProduct(va, vb)
-    try:
-        return math.acos(vector_cos) / math.pi * 180
-    except ValueError:
-        debug_trace()
 
 
 class AnglePlot(QtCore.QObject):
