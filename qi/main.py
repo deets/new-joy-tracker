@@ -61,6 +61,7 @@ class OSCWorker(QtCore.QObject):
             (self._destination, self._port),
             disp,
         )
+        server.timeout = 1
         while self._running:
             server.handle_request()
         self._server_thread.exit()
