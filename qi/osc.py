@@ -56,12 +56,19 @@ class OSCWorkerBase(QtCore.QObject):
         self._running = False
         self._server_thread.wait()
 
-    def reset(self, path):
-        self._sock.sendto(b"R", self._path_to_address[path])
-
     def work(self):
         self._work()
         self._server_thread.exit()
+
+    def reset(self, path):
+        self._sock.sendto(b"R", self._path_to_address[path])
+
+    def update_mask(self, path, mask):
+        msg = b"M" + bytes([mask])
+        self._sock.sendto(
+            msg,
+            self._path_to_address[path],
+        )
 
 
 class OSCWorker(OSCWorkerBase):

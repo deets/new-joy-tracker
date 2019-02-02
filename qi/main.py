@@ -1,7 +1,7 @@
 #!/Library/Frameworks/Python.framework/Versions/3.7/bin/python3.7
 # -*- mode: python -*-
 import os
-import math
+import sys
 from functools import partial
 
 from pyqtgraph.Qt import QtCore, QtGui
@@ -23,6 +23,7 @@ class QuaternionInvestigator(QtCore.QObject):
     )
     new_path = QtCore.pyqtSignal(str, name="new_path")
     reset = QtCore.pyqtSignal(str, name="reset")
+    update_mask = QtCore.pyqtSignal(str, int, name="update_mask")
 
     def __init__(self, osc_worker):
         super().__init__()
@@ -39,6 +40,9 @@ class QuaternionInvestigator(QtCore.QObject):
         self._osc_worker.message.connect(self._got_osc)
         self._osc_worker.new_path.connect(self.new_path)  # just forward
         self.reset.connect(lambda path: self._osc_worker.reset(path))
+        self.update_mask.connect(
+          lambda path, mask: self._osc_worker.update_mask(path, mask),
+        )
 
     def about_to_quit(self):
         self._osc_worker.quit()
@@ -65,7 +69,10 @@ def main():
     app = QtGui.QApplication([])
     wm = WindowManager()
 
-    osc_worker = FileOSCWorker(os.path.expanduser("~/osc-shark-export-2"))
+    if len(sys.argv) == 2:
+        osc_worker = FileOSCWorker(os.path.expanduser(sys.argv[1]))
+    else:
+        osc_worker = OSCWorker("", 10000)
     qi = QuaternionInvestigator(osc_worker)
 
     three_d_window = QtGui.QMainWindow()
