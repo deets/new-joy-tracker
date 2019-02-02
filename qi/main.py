@@ -19,8 +19,10 @@ from .windowmanager import WindowManager
 
 class QuaternionInvestigator(QtCore.QObject):
 
-    quaternion_rep_added = QtCore.pyqtSignal(int, name="quaternion_rep_added")
-    quaternion = QtCore.pyqtSignal(int, QtGui.QQuaternion, name="quaternion")
+    quaternion = QtCore.pyqtSignal(
+      str, int, QtGui.QQuaternion,
+      name="quaternion",
+    )
     new_path = QtCore.pyqtSignal(str, name="new_path")
     reset = QtCore.pyqtSignal(str, name="reset")
 
@@ -49,15 +51,16 @@ class QuaternionInvestigator(QtCore.QObject):
         except ValueError:
             pass
         else:
-            if sensor_no not in self._quaternion_reps:
-                self.add_quaternion_rep(sensor_no)
+            if (path, sensor_no) not in self._quaternion_reps:
+                self.add_quaternion_rep(path, sensor_no)
             quat = QtGui.QQuaternion(q1, q2, q3, q4)
-            self._quaternion_reps[sensor_no].update(quat)
-            self.quaternion.emit(sensor_no, quat)
+            self._quaternion_reps[(path, sensor_no)].update(quat)
+            self.quaternion.emit(path, sensor_no, quat)
 
-    def add_quaternion_rep(self, key):
-        self._quaternion_reps[key] = QuaternionRep(self.widget, key)
-        self.quaternion_rep_added.emit(key)
+    def add_quaternion_rep(self, path, sensor_no):
+        self._quaternion_reps[(path, sensor_no)] = QuaternionRep(
+          self.widget, path, sensor_no,
+        )
 
 
 class AnglePlot(QtCore.QObject):
