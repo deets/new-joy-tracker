@@ -14,24 +14,7 @@ from .three_d import QuaternionRep
 from .processor import QuaternionProcessor
 from .osc import OSCWorker, FileOSCWorker
 from .common import angle_between_quats
-
-
-def save_window_settings(*windows):
-    settings = QtCore.QSettings("deets_design", "quaternion-investigator")
-    for i, window in enumerate(windows):
-        settings.setValue("geometry-{}".format(i), window.saveGeometry())
-        settings.setValue("windowState-{}".format(i), window.saveState())
-
-
-def load_window_settings(*windows):
-    settings = QtCore.QSettings("deets_design", "quaternion-investigator")
-    for i, window in enumerate(windows):
-        saved_geometry = settings.value("geometry-{}".format(i))
-        if saved_geometry is not None:
-            window.restoreGeometry(saved_geometry)
-        saved_state = settings.value("windowState-{}".format(i))
-        if saved_state is not None:
-            window.restoreState(saved_state)
+from .windowmanager import WindowManager
 
 
 class QuaternionInvestigator(QtCore.QObject):
@@ -180,40 +163,47 @@ class ResetController(QtCore.QObject):
 
 def main():
     app = QtGui.QApplication([])
-    mw = QtGui.QMainWindow()
-    mw.setWindowTitle('Quaternion Investigator')
-    cw = QtGui.QWidget()
-    mw.setCentralWidget(cw)
-    layout = QtGui.QVBoxLayout()
-    cw.setLayout(layout)
-
-    reset_controller = ResetController()
-    qp = QuaternionProcessor()
+    wm = WindowManager()
 
     osc_worker = FileOSCWorker(os.path.expanduser("~/osc-shark-export-2"))
-    angle_plot = AnglePlot()
     qi = QuaternionInvestigator(osc_worker)
-    source_selection = SourceSelection()
-    source_selection.indices.connect(angle_plot.update_indices)
 
-    qi.quaternion_rep_added.connect(source_selection.add_source)
-    qi.quaternion.connect(angle_plot.update)
-    qi.quaternion.connect(qp.update)
-    qi.new_path.connect(reset_controller.add_new_path)
-    reset_controller.reset.connect(qi.reset)
+    three_d_window = QtGui.QMainWindow()
+    three_d_window.setObjectName("three_d_window")
+    three_d_window.setWindowTitle('Quaternion Investigator')
+    three_d_window.setCentralWidget(qi.widget)
+    three_d_window.show()
+    wm += three_d_window
 
-    layout.addWidget(reset_controller.widget)
-    layout.addWidget(source_selection.widget)
-    layout.addWidget(angle_plot.widget)
-    mw.show()
+    # mw = QtGui.QMainWindow()
+    # mw.setWindowTitle('Quaternion Investigator')
+    # cw = QtGui.QWidget()
+    # mw.setCentralWidget(cw)
+    # layout = QtGui.QVBoxLayout()
+    # cw.setLayout(layout)
 
-    mw2 = QtGui.QMainWindow()
-    mw2.setCentralWidget(qi.widget)
-    mw2.show()
-    load_window_settings(mw, mw2)
-    app.aboutToQuit.connect(partial(save_window_settings, mw, mw2))
+    # reset_controller = ResetController()
+    # qp = QuaternionProcessor()
+
+    # angle_plot = AnglePlot()
+    # source_selection = SourceSelection()
+    # source_selection.indices.connect(angle_plot.update_indices)
+
+    # qi.quaternion_rep_added.connect(source_selection.add_source)
+    # qi.quaternion.connect(angle_plot.update)
+    # qi.quaternion.connect(qp.update)
+    # qi.new_path.connect(reset_controller.add_new_path)
+    # reset_controller.reset.connect(qi.reset)
+
+    # layout.addWidget(reset_controller.widget)
+    # layout.addWidget(source_selection.widget)
+    # layout.addWidget(angle_plot.widget)
+    # mw.show()
+
+    wm.load_window_settings()
+    app.aboutToQuit.connect(wm.save_window_settings)
     app.aboutToQuit.connect(qi.about_to_quit)
-    for w in [mw, mw2]:
+    for w in [three_d_window]:
         w.raise_()
 
     app.exec_()
