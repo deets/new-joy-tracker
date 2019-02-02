@@ -5,21 +5,23 @@ import PyQt5.QtWidgets as QtWidgets
 from .common import angle_between_quats
 
 
-class AnglePlot(QtCore.QObject):
+class AnglePlot(pg.PlotWidget):
 
     PEN_COLOR = (255, 0, 0)
 
-    def __init__(self):
-        super().__init__()
-        self.widget = pg.PlotWidget(name='Angle Plot')
-        self._curve = self.widget.plot()
+    def __init__(self, path):
+        super().__init__(name='Angle Plot {}'.format(path[1:]))
+        self._path = path
+        self._curve = self.plot()
         self._curve.setPen(self.PEN_COLOR)
         self._data = []
         self._curve.setData(self._data)
         self._a, self._b = None, None
         self._quaternions = {}
 
-    def update(self, sensor_no, quaternion):
+    def update(self, path, sensor_no, quaternion):
+        if path != self._path:
+            return
         self._quaternions[sensor_no] = quaternion
         quat_a = self._quaternions.get(self._a)
         quat_b = self._quaternions.get(self._b)
@@ -40,10 +42,10 @@ class SourceSelection(QtCore.QAbstractListModel):
 
     indices = QtCore.pyqtSignal(int, int, name="indices")
 
-    def __init__(self):
+    def __init__(self, path):
         super().__init__()
-        self._data = [
-        ]
+        self._path = path
+        self._data = []
 
         w = self.widget = QtGui.QWidget()
         layout = QtGui.QHBoxLayout()
@@ -73,13 +75,17 @@ class SourceSelection(QtCore.QAbstractListModel):
     def rowCount(self, _parent):
         return len(self._data)
 
-    def add_source(self, source):
+    def _add_source(self, source):
         self.beginInsertRows(
             QtCore.QModelIndex(),
             len(self._data), len(self._data)
         )
         self._data.append(source)
         self.endInsertRows()
+
+    def update(self, path, sensor_no, _quat):
+        if path == self._path and sensor_no not in self._data:
+            self._add_source(sensor_no)
 
 
 class ResetController(QtCore.QObject):
@@ -106,7 +112,7 @@ class ResetController(QtCore.QObject):
             self.reset.emit(self._dest.currentText())
 
 
-def setup_window_for_path(windowmanager, path):
+def setup_window_for_path(windowmanager, qi, path):
     # this is a slot that will be called all then
     # time so quickly do nothing if we don't have to
     if path in windowmanager:
@@ -114,4 +120,25 @@ def setup_window_for_path(windowmanager, path):
 
     w = windowmanager.create_window(path)
     w.setWindowTitle(path)
+
+    cw = QtGui.QWidget()
+    w.setCentralWidget(cw)
+    layout = QtGui.QVBoxLayout()
+    cw.setLayout(layout)
+
+    angle_plot = AnglePlot(path)
+    source_selection = SourceSelection(path)
+    source_selection.indices.connect(angle_plot.update_indices)
+
+    qi.quaternion.connect(source_selection.update)
+    qi.quaternion.connect(angle_plot.update)
+
+    # reset_controller = ResetController()
+    # qp = QuaternionProcessor()
+    # qi.quaternion.connect(qp.update)
+    # reset_controller.reset.connect(qi.reset)
+
+    layout.addWidget(source_selection.widget)
+    layout.addWidget(angle_plot)
+
     w.show()

@@ -74,31 +74,7 @@ def main():
     three_d_window.show()
     wm += three_d_window
 
-    qi.new_path.connect(partial(setup_window_for_path, wm))
-    # mw = QtGui.QMainWindow()
-    # mw.setWindowTitle('Quaternion Investigator')
-    # cw = QtGui.QWidget()
-    # mw.setCentralWidget(cw)
-    # layout = QtGui.QVBoxLayout()
-    # cw.setLayout(layout)
-
-    # reset_controller = ResetController()
-    # qp = QuaternionProcessor()
-
-    # angle_plot = AnglePlot()
-    # source_selection = SourceSelection()
-    # source_selection.indices.connect(angle_plot.update_indices)
-
-    # qi.quaternion_rep_added.connect(source_selection.add_source)
-    # qi.quaternion.connect(angle_plot.update)
-    # qi.quaternion.connect(qp.update)
-    # qi.new_path.connect(reset_controller.add_new_path)
-    # reset_controller.reset.connect(qi.reset)
-
-    # layout.addWidget(reset_controller.widget)
-    # layout.addWidget(source_selection.widget)
-    # layout.addWidget(angle_plot.widget)
-    # mw.show()
+    qi.new_path.connect(partial(setup_window_for_path, wm, qi))
 
     wm.load_window_settings()
     app.aboutToQuit.connect(wm.save_window_settings)
