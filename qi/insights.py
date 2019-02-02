@@ -1,3 +1,4 @@
+import bisect
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 import PyQt5.QtWidgets as QtWidgets
@@ -101,6 +102,45 @@ class ResetController(QtWidgets.QPushButton):
         self.reset.emit(self._path)
 
 
+class MaskController(QtWidgets.QWidget):
+
+    update_mask = QtCore.pyqtSignal(str, int, name="update_mask")
+
+    def __init__(self, path):
+        super().__init__()
+        self._path = path
+        self._checkboxes = {}
+        self._state = {}
+        self._layout = QtGui.QHBoxLayout()
+        self.setLayout(self._layout)
+        self._layout.addWidget(QtWidgets.QLabel(text="Mask:"))
+        b = QtWidgets.QPushButton("Update")
+        b.clicked.connect(self._update_mask)
+        self._layout.addWidget(b)
+
+    def _update_mask(self):
+        mask = 0
+        for sensor_no, is_masked in self._state.items():
+            mask |= is_masked << sensor_no
+        self.update_mask.emit(self._path, mask)
+
+    def update(self, path, sensor_no, _quat):
+        if path == self._path and sensor_no not in self._checkboxes:
+            cb = self._checkboxes[sensor_no] = QtWidgets.QCheckBox(
+                str(sensor_no), self
+            )
+
+            def update_state(state):
+                self._state[sensor_no] = state == 2  # from the docs
+
+            cb.stateChanged.connect(update_state)
+
+            known = [(so, w) for so, w in self._checkboxes.items()]
+            pos = bisect.bisect_left(known, (sensor_no, cb))
+            pos += 1
+            self._layout.insertWidget(pos, cb)
+
+
 def setup_window_for_path(windowmanager, qi, path):
     # this is a slot that will be called all then
     # time so quickly do nothing if we don't have to
@@ -117,17 +157,21 @@ def setup_window_for_path(windowmanager, qi, path):
 
     angle_plot = AnglePlot(path)
     source_selection = SourceSelection(path)
+    mask_controller = MaskController(path)
     source_selection.indices.connect(angle_plot.update_indices)
 
     qi.quaternion.connect(source_selection.update)
     qi.quaternion.connect(angle_plot.update)
+    qi.quaternion.connect(mask_controller.update)
 
     reset_button = ResetController(path)
     # qp = QuaternionProcessor()
     # qi.quaternion.connect(qp.update)
     reset_button.reset.connect(qi.reset)
+    mask_controller.update_mask.connect(qi.update_mask)
 
     layout.addWidget(reset_button)
+    layout.addWidget(mask_controller)
     layout.addWidget(source_selection.widget)
     layout.addWidget(angle_plot)
 
