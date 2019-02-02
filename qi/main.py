@@ -14,6 +14,7 @@ from .osc import OSCWorker, FileOSCWorker
 from .windowmanager import WindowManager
 from .insights import setup_window_for_path
 
+
 class QuaternionInvestigator(QtCore.QObject):
 
     quaternion = QtCore.pyqtSignal(
@@ -37,7 +38,7 @@ class QuaternionInvestigator(QtCore.QObject):
         self._osc_worker = osc_worker
         self._osc_worker.message.connect(self._got_osc)
         self._osc_worker.new_path.connect(self.new_path)  # just forward
-        self.reset.connect(self._osc_worker.reset)  # just forward
+        self.reset.connect(lambda path: self._osc_worker.reset(path))
 
     def about_to_quit(self):
         self._osc_worker.quit()

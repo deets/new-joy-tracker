@@ -2,6 +2,7 @@
 # Copyright: 2019, Diez B. Roggisch, Berlin . All rights reserved.
 import time
 import datetime
+import socket
 
 from pythonosc import osc_server
 from pythonosc import dispatcher
@@ -11,6 +12,8 @@ CONVERTERS = {
     "i": int,
     "f": float,
 }
+
+DUMMY_ADDRESS = ("", 12345)
 
 
 def process_file(filename, sleep=True, speedup=1):
@@ -22,7 +25,7 @@ def process_file(filename, sleep=True, speedup=1):
             if sleep and last_ts is not None:
                 time.sleep((ts - last_ts).seconds / speedup)
             last_ts = ts
-            yield None, path, \
+            yield DUMMY_ADDRESS, path, \
                   [CONVERTERS[kind](v)
                        for v, kind in zip(values, structure)
                   ]
@@ -36,15 +39,16 @@ class OSCWorkerBase(QtCore.QObject):
     def __init__(self):
         super().__init__()
         self._running = True
-        self._addresses_to_path = {}
+        self._path_to_address = {}
         self._server_thread = QtCore.QThread()
         self.moveToThread(self._server_thread)
         self._server_thread.started.connect(self.work)
         self._server_thread.start()
+        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def _process_message(self, address, path, args):
-        if path not in self._addresses_to_path:
-            self._addresses_to_path[path] = address
+        if path not in self._path_to_address:
+            self._path_to_address[path] = address
             self.new_path.emit(path)
         self.message.emit([path] + list(args))
 
@@ -53,7 +57,7 @@ class OSCWorkerBase(QtCore.QObject):
         self._server_thread.wait()
 
     def reset(self, path):
-        print("resetting", path)
+        self._sock.sendto(b"R", self._path_to_address[path])
 
     def work(self):
         self._work()

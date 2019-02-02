@@ -88,28 +88,17 @@ class SourceSelection(QtCore.QAbstractListModel):
             self._add_source(sensor_no)
 
 
-class ResetController(QtCore.QObject):
+class ResetController(QtWidgets.QPushButton):
 
     reset = QtCore.pyqtSignal(str, name="reset")
 
-    def __init__(self):
-        super().__init__()
-        w = self.widget = QtGui.QWidget()
-        layout = QtGui.QHBoxLayout()
-        w.setLayout(layout)
-
-        self._dest = QtWidgets.QComboBox()
-        self._reset = QtWidgets.QPushButton("Reset!")
-        layout.addWidget(self._dest)
-        layout.addWidget(self._reset)
-        self._reset.clicked.connect(self.send_reset)
-
-    def add_new_path(self, path):
-        self._dest.addItem(path)
+    def __init__(self, path):
+        super().__init__("Reset!")
+        self._path = path
+        self.clicked.connect(self.send_reset)
 
     def send_reset(self):
-        if self._dest.currentText():
-            self.reset.emit(self._dest.currentText())
+        self.reset.emit(self._path)
 
 
 def setup_window_for_path(windowmanager, qi, path):
@@ -133,11 +122,12 @@ def setup_window_for_path(windowmanager, qi, path):
     qi.quaternion.connect(source_selection.update)
     qi.quaternion.connect(angle_plot.update)
 
-    # reset_controller = ResetController()
+    reset_button = ResetController(path)
     # qp = QuaternionProcessor()
     # qi.quaternion.connect(qp.update)
-    # reset_controller.reset.connect(qi.reset)
+    reset_button.reset.connect(qi.reset)
 
+    layout.addWidget(reset_button)
     layout.addWidget(source_selection.widget)
     layout.addWidget(angle_plot)
 
