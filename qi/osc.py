@@ -47,6 +47,8 @@ class OSCWorkerBase(QtCore.QObject):
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def _process_message(self, address, path, args):
+        if path == "/IGNORE":
+            return
         if path not in self._path_to_address:
             self._path_to_address[path] = address
             self.new_path.emit(path)
