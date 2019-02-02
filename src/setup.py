@@ -50,7 +50,7 @@ IRQ = 21
 PORT = 5000
 OSC_PORT = 10000
 CONNECT_TIMEOUT = 100
-RESET_COUNT = 10  # after these, we try to reset the board for reconnection
+RESET_COUNT = 20  # after these, we try to reset the board for reconnection
 LOOP_SLEEP_MS = 70
 SENSOR_PERIOD = 5  # in milliseconds
 I2C_FREQUENCY = 1000_000
@@ -99,6 +99,12 @@ CONNECT_TO_NET = True
 SETUP_DEBUG_PIN = True
 
 
+def wait_while_idling(seconds):
+    then = time.time() + seconds
+    while then > time.time():
+        machine.idle()
+
+
 def main():
     if SETUP_DEBUG_PIN:
         debugpin.setup()
@@ -128,17 +134,17 @@ def main():
     # this is needed to open the socket
     while True:
         print("connecting...")
+        wait_while_idling(10)
         try:
-            # s = setup_socket(nic)
             osc_client.send("/IGNORE", 0)
             poll.register(osc_client.sock, uselect.POLLIN)
             while True:
+                machine.idle()
                 protocol.update()
                 protocol.send_osc(osc_client)
                 for sock, kind in poll.ipoll(LOOP_SLEEP_MS):
                     incoming = sock.recv(100)
                     protocol.process_incoming(incoming)
-                machine.idle()
                 if debugpin.DEBUG_MODE:
                     print(".", end="")
         except OSError:

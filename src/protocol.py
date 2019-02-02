@@ -39,6 +39,7 @@ class Protocol:
             2: "",
             3: "",
         }
+        self._mask = 0
 
     def register_task(self, bus, address, task, buffer_size, busno):
         self._tasks.append((bus, address, task, buffer_size, busno))
@@ -124,6 +125,8 @@ class Protocol:
 
     def send_osc(self, osc):
         for i, (osc_payload_start, spec) in enumerate(self._osc_spec):
+            if 1 << i & self._mask:
+                continue
             args = ustruct.unpack_from(
                 spec,
                 self.buffer,
@@ -139,5 +142,10 @@ class Protocol:
                 print(i, args)
 
     def process_incoming(self, message):
-        if message == b"R":
+        if message[0] == ord(b"R"):
             machine.reset()
+        elif message[0] == ord(b"M"):
+            mask = message[1]
+            if debugpin.DEBUG_MODE:
+                print('updating mask to', mask)
+            self._mask = mask
