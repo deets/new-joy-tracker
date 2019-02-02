@@ -2,6 +2,7 @@
 # Copyright: 2018, Diez B. Roggisch, Berlin . All rights reserved.
 
 import machine
+import uselect
 import time
 import socket
 import mpu6050
@@ -123,14 +124,20 @@ def main():
     # we have a spurious boot pin trigger,
     # I force debug off once here
     debugpin.DEBUG_MODE = False
+    poll = uselect.poll()
+    # this is needed to open the socket
     while True:
         print("connecting...")
         try:
             # s = setup_socket(nic)
+            osc_client.send("/IGNORE", 0)
+            poll.register(osc_client.sock, uselect.POLLIN)
             while True:
                 protocol.update()
                 protocol.send_osc(osc_client)
-                time.sleep_ms(LOOP_SLEEP_MS)
+                for sock, kind in poll.ipoll(LOOP_SLEEP_MS):
+                    incoming = sock.recv(100)
+                    protocol.process_incoming(incoming)
                 machine.idle()
                 if debugpin.DEBUG_MODE:
                     print(".", end="")
