@@ -137,3 +137,7 @@ class Protocol:
                 osc.send(self._osc_path, i, utime.ticks_ms(), *args)
             if debugpin.DEBUG_MODE:
                 print(i, args)
+
+    def process_incoming(self, message):
+        if message == b"R":
+            machine.reset()
