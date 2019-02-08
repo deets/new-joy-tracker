@@ -51,6 +51,7 @@ PORT = 5000
 OSC_PORT = 10000
 CONNECT_TIMEOUT = 100
 RESET_COUNT = 20  # after these, we try to reset the board for reconnection
+WIFI_COOLDOWN_PHASE = 10 # number of seconds we wait for a really stable connection
 LOOP_SLEEP_MS = 70
 SENSOR_PERIOD = 5  # in milliseconds
 I2C_FREQUENCY = 1000_000
@@ -96,7 +97,7 @@ def setup_all():
 
 
 CONNECT_TO_NET = True
-SETUP_DEBUG_PIN = True
+SETUP_DEBUG_PIN = False
 
 
 def wait_while_idling(seconds):
@@ -133,7 +134,7 @@ def main():
     poll = uselect.poll()
     while True:
         print("connecting...")
-        wait_while_idling(10)
+        wait_while_idling(WIFI_COOLDOWN_PHASE)
         try:
             # this is needed to open the socket
             osc_client.send("/IGNORE", 0)
