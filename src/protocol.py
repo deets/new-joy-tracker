@@ -11,7 +11,7 @@ from names import MAPPING
 class Protocol:
 
     TASK_SPEC = {
-        newjoy.TASK_MPU6050: "fffffff",
+        newjoy.TASK_MPU6050: "ffffff",
         newjoy.TASK_BMP280: "I",
     }
 
