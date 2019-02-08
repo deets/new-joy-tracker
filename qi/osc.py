@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright: 2019, Diez B. Roggisch, Berlin . All rights reserved.
 import time
+import struct
 import datetime
 import socket
 
@@ -69,6 +70,14 @@ class OSCWorkerBase(QtCore.QObject):
 
     def update_mask(self, path, mask):
         msg = b"M" + bytes([mask])
+        self._sock.sendto(
+            msg,
+            self._path_to_address[path],
+        )
+
+    def update_gain(self, path, sensor_no, gain):
+        msg = b"G" + struct.pack("<Bf", sensor_no, gain)
+        print(msg)
         self._sock.sendto(
             msg,
             self._path_to_address[path],

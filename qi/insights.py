@@ -213,6 +213,41 @@ class MaskController(QtWidgets.QWidget):
             self._layout.insertWidget(pos, cb)
 
 
+class GainController(QtWidgets.QWidget):
+
+    update_gain = QtCore.pyqtSignal(str, int, float, name="update_gain")
+
+    def __init__(self, path):
+        super().__init__()
+        self._path = path
+        self._sensor_no = 0
+        self._layout = QtGui.QHBoxLayout()
+        self.setLayout(self._layout)
+        b = QtWidgets.QPushButton("Update")
+        b.clicked.connect(self._update_gain)
+
+        s = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        s.setMinimum(0)
+        s.setMaximum(100)
+        s.setValue(100)
+        self._gain = 100
+
+        def gain_changed(v):
+            self._gain = v
+
+        s.valueChanged.connect(gain_changed)
+        b.clicked.connect(self._update_gain)
+        self._layout.addWidget(QtWidgets.QLabel(text="Gain:"))
+        self._layout.addWidget(s)
+        self._layout.addWidget(b)
+
+    def _update_gain(self):
+        self.update_gain.emit(self._path, self._sensor_no, self._gain / 100.0)
+
+    def update_sensor_no(self, sensor_no):
+        self._sensor_no = sensor_no
+
+
 def setup_window_for_path(windowmanager, qi, path):
     # this is a slot that will be called all then
     # time so quickly do nothing if we don't have ot
@@ -242,17 +277,21 @@ def setup_window_for_path(windowmanager, qi, path):
     reset_button.reset.connect(qi.reset)
     mask_controller.update_mask.connect(qi.update_mask)
 
-    sensor_select = SensorSelection(path)
-    qi.acceleration.connect(sensor_select.update)
     acc_plot = AccPlot(path)
+    sensor_select = SensorSelection(path)
+    gain_control = GainController(path)
+    qi.acceleration.connect(sensor_select.update)
     qi.acceleration.connect(acc_plot.update)
     sensor_select.sensor_no.connect(acc_plot.update_sensor_no)
+    sensor_select.sensor_no.connect(gain_control.update_sensor_no)
+    gain_control.update_gain.connect(qi.update_gain)
 
     layout.addWidget(reset_button)
     layout.addWidget(mask_controller)
     layout.addWidget(source_selection.widget)
     layout.addWidget(angle_plot)
     layout.addWidget(sensor_select.widget)
+    layout.addWidget(gain_control)
     layout.addWidget(acc_plot)
 
     w.show()

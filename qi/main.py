@@ -27,6 +27,7 @@ class QuaternionInvestigator(QtCore.QObject):
     new_path = QtCore.pyqtSignal(str, name="new_path")
     reset = QtCore.pyqtSignal(str, name="reset")
     update_mask = QtCore.pyqtSignal(str, int, name="update_mask")
+    update_gain = QtCore.pyqtSignal(str, int, float, name="update_gain")
 
     def __init__(self, osc_worker):
         super().__init__()
@@ -45,6 +46,13 @@ class QuaternionInvestigator(QtCore.QObject):
         self.reset.connect(lambda path: self._osc_worker.reset(path))
         self.update_mask.connect(
           lambda path, mask: self._osc_worker.update_mask(path, mask),
+        )
+        self.update_gain.connect(
+            lambda path, sensor_no, gain: self._osc_worker.update_gain(
+                path,
+                sensor_no,
+                gain,
+            ),
         )
         self._osc_worker.start()
 

@@ -111,8 +111,6 @@ class Protocol:
             current |= task << (4 * (i % 2))
             descriptor[offset] = current
             newjoy.add_task(bus, address, task, task_byte_offset)
-            newjoy.set_task_parameters(i, ustruct.pack("<f", .5))
-
             task_byte_offset += task_size
             osc_payload_start += task_size
 
@@ -151,3 +149,6 @@ class Protocol:
             if debugpin.DEBUG_MODE:
                 print('updating mask to', mask)
             self._mask = mask
+        elif message[0] == ord(b"G"):
+            sensor_no, gain = ustruct.unpack("<Bf", message[1:])
+            newjoy.set_task_parameters(sensor_no, ustruct.pack("<f", gain))
