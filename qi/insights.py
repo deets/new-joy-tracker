@@ -39,6 +39,43 @@ class AnglePlot(pg.PlotWidget):
             self._curve.setData(self._data)
 
 
+class AccPlot(pg.PlotWidget):
+
+    ACC_COLOR = (0, 255, 0)
+    ACC_F_COLOR = (255, 255, 0)
+
+    def __init__(self, path):
+        super().__init__(name='Acc Plot {}'.format(path[1:]))
+        self._path = path
+        self._acc = self.plot()
+        self._acc.setPen(self.ACC_COLOR)
+        self._acc_data = []
+        self._acc.setData(self._acc_data)
+
+        self._acc_f = self.plot()
+        self._acc_f.setPen(self.ACC_F_COLOR)
+        self._acc_f_data = []
+        self._acc_f.setData(self._acc_f_data)
+
+        self._sensor_no = 0
+
+    def update(self, path, sensor_no, acc, acc_f):
+        if path != self._path:
+            return
+        self._acc_data.append(acc)
+        self._acc.setData(self._acc_data)
+        self._acc_f_data.append(acc_f)
+        self._acc_f.setData(self._acc_f_data)
+
+    def update_sensor_no(self, sensor_no):
+        if sensor_no != self._sensor_no:
+            self._sensor_no = sensor_no
+            self._acc_data = []
+            self._acc.setData(self._acc_data)
+            self._acc_f_data = []
+            self._acc_f.setData(self._acc_f_data)
+
+
 class SourceSelection(QtCore.QAbstractListModel):
 
     indices = QtCore.pyqtSignal(int, int, name="indices")
@@ -87,6 +124,41 @@ class SourceSelection(QtCore.QAbstractListModel):
     def update(self, path, sensor_no, _quat):
         if path == self._path and sensor_no not in self._data:
             self._add_source(sensor_no)
+
+
+class SensorSelection(QtCore.QAbstractListModel):
+
+    sensor_no = QtCore.pyqtSignal(int, name="sensor_no")
+
+    def __init__(self, path):
+        super().__init__()
+        self._path = path
+        self._data = []
+        w = self.widget = QtGui.QWidget()
+        layout = QtGui.QHBoxLayout()
+        w.setLayout(layout)
+
+        self._sensor_no = QtWidgets.QComboBox()
+        self._sensor_no.setModel(self)
+        self._sensor_no.currentIndexChanged.connect(self.sensor_no)
+        layout.addWidget(self._sensor_no)
+
+    def data(self, index, role):
+        if index.row() < len(self._data):
+            return self._data[index.row()]
+        return QtCore.QVariant()
+
+    def rowCount(self, _parent):
+        return len(self._data)
+
+    def update(self, path, sensor_no, _acc, _acc_f):
+        if path == self._path and sensor_no not in self._data:
+            self.beginInsertRows(
+                QtCore.QModelIndex(),
+                len(self._data), len(self._data)
+            )
+            self._data.append(sensor_no)
+            self.endInsertRows()
 
 
 class ResetController(QtWidgets.QPushButton):
@@ -143,7 +215,7 @@ class MaskController(QtWidgets.QWidget):
 
 def setup_window_for_path(windowmanager, qi, path):
     # this is a slot that will be called all then
-    # time so quickly do nothing if we don't have to
+    # time so quickly do nothing if we don't have ot
     if path in windowmanager:
         return
 
@@ -170,9 +242,17 @@ def setup_window_for_path(windowmanager, qi, path):
     reset_button.reset.connect(qi.reset)
     mask_controller.update_mask.connect(qi.update_mask)
 
+    sensor_select = SensorSelection(path)
+    qi.acceleration.connect(sensor_select.update)
+    acc_plot = AccPlot(path)
+    qi.acceleration.connect(acc_plot.update)
+    sensor_select.sensor_no.connect(acc_plot.update_sensor_no)
+
     layout.addWidget(reset_button)
     layout.addWidget(mask_controller)
     layout.addWidget(source_selection.widget)
     layout.addWidget(angle_plot)
+    layout.addWidget(sensor_select.widget)
+    layout.addWidget(acc_plot)
 
     w.show()

@@ -111,6 +111,8 @@ class Protocol:
             current |= task << (4 * (i % 2))
             descriptor[offset] = current
             newjoy.add_task(bus, address, task, task_byte_offset)
+            newjoy.set_task_parameters(i, ustruct.pack("<f", .5))
+
             task_byte_offset += task_size
             osc_payload_start += task_size
 

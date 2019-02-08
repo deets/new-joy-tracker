@@ -131,11 +131,11 @@ def main():
     # I force debug off once here
     debugpin.DEBUG_MODE = False
     poll = uselect.poll()
-    # this is needed to open the socket
     while True:
         print("connecting...")
         wait_while_idling(10)
         try:
+            # this is needed to open the socket
             osc_client.send("/IGNORE", 0)
             poll.register(osc_client.sock, uselect.POLLIN)
             while True:

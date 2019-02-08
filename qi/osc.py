@@ -43,8 +43,10 @@ class OSCWorkerBase(QtCore.QObject):
         self._server_thread = QtCore.QThread()
         self.moveToThread(self._server_thread)
         self._server_thread.started.connect(self.work)
-        self._server_thread.start()
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    def start(self):
+        self._server_thread.start()
 
     def _process_message(self, address, path, args):
         if path == "/IGNORE":
@@ -76,8 +78,8 @@ class OSCWorkerBase(QtCore.QObject):
 class OSCWorker(OSCWorkerBase):
 
     def __init__(self, destination, port):
-        super().__init__()
         self._destination, self._port = destination, port
+        super().__init__()
 
     def _work(self):
         disp = dispatcher.Dispatcher()

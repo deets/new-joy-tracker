@@ -21,6 +21,9 @@ class QuaternionInvestigator(QtCore.QObject):
       str, int, QtGui.QQuaternion,
       name="quaternion",
     )
+    acceleration = QtCore.pyqtSignal(
+        str, int, float, float, name="acceleration",
+    )
     new_path = QtCore.pyqtSignal(str, name="new_path")
     reset = QtCore.pyqtSignal(str, name="reset")
     update_mask = QtCore.pyqtSignal(str, int, name="update_mask")
@@ -43,13 +46,14 @@ class QuaternionInvestigator(QtCore.QObject):
         self.update_mask.connect(
           lambda path, mask: self._osc_worker.update_mask(path, mask),
         )
+        self._osc_worker.start()
 
     def about_to_quit(self):
         self._osc_worker.quit()
 
     def _got_osc(self, message):
         try:
-            path, sensor_no, uptime, q1, q2, q3, q4, *_ = message
+            path, sensor_no, uptime, q1, q2, q3, q4, acc, acc_f = message
         except ValueError:
             pass
         else:
@@ -58,6 +62,7 @@ class QuaternionInvestigator(QtCore.QObject):
             quat = QtGui.QQuaternion(q1, q2, q3, q4)
             self._quaternion_reps[(path, sensor_no)].update(quat)
             self.quaternion.emit(path, sensor_no, quat)
+            self.acceleration.emit(path, sensor_no, acc, acc_f)
 
     def add_quaternion_rep(self, path, sensor_no):
         self._quaternion_reps[(path, sensor_no)] = QuaternionRep(
